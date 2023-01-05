@@ -133,7 +133,7 @@ public class CreateGameController {
             }
             int time = 0;
             if(timey.isSelected())
-                time = (int)timeSlider.getValue();
+                time = (int)timeSlider.getValue() * 60; // add needs //time is set in seconds
 
             server = ServerFactory.createServer(fields, hostName, gameName, password, rounds, mode, time);
 
@@ -169,7 +169,7 @@ public class CreateGameController {
                 e.printStackTrace();
             }
 
-            new Thread( ()->{ //can be without thread? yes I think
+            new Thread( ()->{ //can be without thread? yes I think (no) I think
                 server.startGame();
             }).start();
 

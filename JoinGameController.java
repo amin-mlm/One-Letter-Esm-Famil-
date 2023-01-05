@@ -37,7 +37,7 @@ public class JoinGameController {
     @FXML
     void initialize() {
         ArrayList<Server> servers = databaseHandler.showServers();
-        System.out.println("in JoinGameContro: " + servers);
+        System.out.println("in JoinGameContro: " + servers.size());
         serversObservableList = FXCollections.observableArrayList();
         for(Server server : servers){
             serversObservableList.add(server);
@@ -88,18 +88,18 @@ public class JoinGameController {
 //        new Thread(()->{
             Platform.runLater(()->{
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
-                GameScreenController controller = new GameScreenController();
+                GameScreenController gameScreenController = new GameScreenController();
                 try {
-                    fxmlLoader.setController(controller);
-                    controller.setClient(client);
+                    fxmlLoader.setController(gameScreenController);
+                    gameScreenController.setClient(client);
                     Parent root = fxmlLoader.load();
                     rootPane.getChildren().setAll(root);
-        //            ((GameScreenController)fxmlLoader.getController()).setClient(client);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
 //        }).start();
+
 
     }
 

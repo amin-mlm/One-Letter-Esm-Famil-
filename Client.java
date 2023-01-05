@@ -20,6 +20,10 @@ public class Client {
     private Scanner scanner;
     private PrintWriter printWriter;
 
+    private GameScreenController gameScreenController;
+
+
+
     public Client(String name) {
         this.name = name;
     }
@@ -83,6 +87,13 @@ public class Client {
         }
     }
 
+    public int sendAlphabet(String alphabetChar) {
+        printWriter.println(alphabetChar);
+        return Integer.parseInt(scanner.nextLine());
+    }
+
+
+
     public ArrayList<String> getFields() {
         return fields;
     }
@@ -101,6 +112,15 @@ public class Client {
 
     public String getPlan() {
         return plan;
+    }
+
+    public void setGameScreenController(GameScreenController gameScreenController) {
+        this.gameScreenController = gameScreenController;
+    }
+
+
+    public char listenForAlphabet() {
+        return scanner.nextLine().charAt(0);
     }
 }
 

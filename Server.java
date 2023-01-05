@@ -1,6 +1,7 @@
 package com.example.newesmfamil2;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -19,7 +20,12 @@ public class Server {
     private int rounds;
     private int time;
 
+    private int thisRound = 1;
+    private String serverPlan;
+    private ArrayList<Character> usedAlphabets = new ArrayList<>();
+
     boolean isGettingClientEnough = false;
+
 
     private ArrayList<Socket> sockets = new ArrayList<>();
     private ArrayList<Scanner> scanners = new ArrayList<>();
@@ -28,7 +34,7 @@ public class Server {
 
     public Server(int port, String password, ArrayList<String> fields, String hostName, String gameName, int rounds, String gameMode, int time) {
         this.fields = fields;
-        if(fields!=null)
+        if(fields!=null) //we need to create some deficient
             this.numFields = fields.size();
         this.hostName = hostName;
         this.gameName = gameName;
@@ -114,44 +120,100 @@ public class Server {
         printWriters.add(0, lastPrintWriter);
 
 
-        //set and send plan for specifying alphabets via clients
+        //set plan for server to get alphabet from clients
+        //for instance,plan: 0123012 means client index 0 (in scanners list) should
+        //determine the game alphabet in the first game,
+        //client index 1 should determine in the second game and so on.
         int numPlayers = sockets.size();
+        serverPlan = "";
+        for (int i = 0; i < rounds; i++) {
+            serverPlan += i%numPlayers;
+        }
+
+        //set and send the plan for determining alphabets via clients
+        //for instance,plan: 0100010 means this client should determine the
+        //game alphabet in the second and sixth game.
         for(int i=0; i<numPlayers; i++){
-            String plan = "";
+            String clientPlan = "";
             for(int j=0; j<rounds; j++){
                 if(j%numPlayers==i)
-                    plan += "1";
+                    clientPlan += "1";
                 else
-                    plan += "0";
+                    clientPlan += "0";
             }
-            printWriters.get(i).println(plan);
+            printWriters.get(i).println(clientPlan);
         }
 
 
         sendNotif();
-//
-//        new Thread( ()->{
-//            Platform.runLater( ()->{
-//                ((CreateGameController)(GameModeController.fxmlLoader.getController())).gotoGameScreen(this);
-//            });
-//        }).start();
 
-//        new Thread( ()->{
-                                        //checkAnswers();
-//        }).start();
+        //ye go to game screen inja buddaaaaaaaaaaaaaaaaaa gozashtam too io.txt file
+
+        new Thread( ()->{ //can be without thread? yes I think
+            determineAlphabet();
+            checkAnswers();
+        }).start();
 
     }
+
+    private void determineAlphabet() {
+        int playerIndex = Integer.parseInt(serverPlan.charAt(thisRound - 1)+""); //because thisRound start from 1
+        String alphabetString = scanners.get(playerIndex).nextLine();
+        char alphabetChar = alphabetString.charAt(0);
+        if(!usedAlphabets.contains(alphabetChar)){
+            usedAlphabets.add(alphabetChar);
+            printWriters.get(playerIndex).println(0+""); //code for no problem
+
+            try {
+                Thread.sleep(200); // can be omitted? yes 99%
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            sendAlphabet(alphabetChar);
+
+        }else{ //sent alphabet was repeated
+            printWriters.get(playerIndex).println(-1+""); //code for problem
+            determineAlphabet();
+        }
+    }
+
+    private void sendAlphabet(char alphabetChar) {
+        for (int i = 0; i < printWriters.size(); i++) {
+            printWriters.get(i).println(alphabetChar + "");
+        }
+    }
+
+    //get 1 field answer from all clients and
+    // send back the points they gave for this field
+    // and then go for next field and so on
+    private void checkAnswers() {
+        for(int i=0; i<numFields; i++) {
+            ArrayList<String> answers = new ArrayList<>();
+            ArrayList<String> points = new ArrayList<>();
+
+            for (int j = 0; j < scanners.size(); j++) {
+                answers.add(scanners.get(j).nextLine());
+            }
+            points = calculatePoints(answers, fields.get(i));
+            for (int j = 0; j < printWriters.size(); j++) {
+                printWriters.get(j).println(points.get(j));
+            }
+
+        }
+    }
+
+    private ArrayList<String> calculatePoints(ArrayList<String> answers, String category) {
+
+
+    }
+
 
     private void sendNotif() {
         for (PrintWriter p: printWriters) {
             p.println("go to game");
         }
     }
-
-
-
-
-
 
 
 
