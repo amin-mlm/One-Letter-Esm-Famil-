@@ -86,6 +86,10 @@ public class GameScreenController {
                 sendAlphabet();
             }).start();
         });
+
+        finishButton.setOnAction(actionEvent ->{
+            client.sendFinishState();
+        });
     }
 
     private void sendAlphabet() {
@@ -119,18 +123,45 @@ public class GameScreenController {
     }
 
     private void startGame() {
+        new Thread(()->{
+           String message = client.listenToSendAnswerMessage();
+           if(message.equals("Send Your Answers")){
+               Platform.runLater(()->{
+                   for (int i = 0; i < textFields.size(); i++) {
+                       textFields.get(i).setDisable(true);
+                   }
+               });
+
+               for (int i = 0; i < fieldsString.size(); i++) {
+                   int point = client.sendAnswerAndGetPoint(textFields.get(i).getText());
+                   String tempAnswer = textFields.get(i).getText();
+                   textFields.get(i).setText(tempAnswer + ", " + point);
+                   // add needs
+               }
+           }
+        }).start();
+
         if(gameMode.equals("Game Is Finished When The Time Is Over")){
             System.out.println("game is timeyy");
             timeLabel.setVisible(true);
             timeLabel.setDisable(false);
-            new Thread( ()->{
-                showTime();
-            }).start();
-        }else{
+
+            showTime();
+            System.out.println("time finished");
+
+            client.sendFinishState();
+
+
+
+        }else if(gameMode.equals("Game Is Finished When A Player Finished")){
+            System.out.println("game is stopyy");
             finishButton.setVisible(true);
             finishButton.setDisable(false);
+
+
         }
     }
+
 
     private void listenForAlphabet() {
         alphabet = client.listenForAlphabet();
@@ -162,8 +193,6 @@ public class GameScreenController {
             }
             secondTime = (long) (System.nanoTime() / Math.pow(10, 9));
         } while (secondTime - firstTime <= time);
-
-        ///send answers
 
     }
 

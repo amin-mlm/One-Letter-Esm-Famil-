@@ -1,7 +1,5 @@
 package com.example.newesmfamil2;
 
-import javafx.application.Platform;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -121,6 +119,25 @@ public class Client {
 
     public char listenForAlphabet() {
         return scanner.nextLine().charAt(0);
+    }
+
+    public String listenToSendAnswerMessage() {
+        String message = scanner.nextLine();
+        System.out.println("message in client, " + message);
+        if(message.equals("Send Your Answers")){
+            System.out.println("client, I Will Send The Answer Now");
+            printWriter.println("I Will Send The Answer Now");
+        }
+        return message;
+    }
+
+    public void sendFinishState() {
+        printWriter.println("I Finish This Round");
+    }
+
+    public int sendAnswerAndGetPoint(String answer) {
+        printWriter.println(answer);
+        return Integer.parseInt(scanner.nextLine());
     }
 }
 

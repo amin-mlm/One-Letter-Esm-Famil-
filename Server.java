@@ -1,7 +1,6 @@
 package com.example.newesmfamil2;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ public class Server {
     private ArrayList<Character> usedAlphabets = new ArrayList<>();
 
     boolean isGettingClientEnough = false;
+    boolean didClientsSendAnswers = false;
 
 
     private ArrayList<Socket> sockets = new ArrayList<>();
@@ -34,7 +34,7 @@ public class Server {
 
     public Server(int port, String password, ArrayList<String> fields, String hostName, String gameName, int rounds, String gameMode, int time) {
         this.fields = fields;
-        if(fields!=null) //we need to create some deficient
+        if (fields != null) //we need to create some deficient
             this.numFields = fields.size();
         this.hostName = hostName;
         this.gameName = gameName;
@@ -61,7 +61,7 @@ public class Server {
 
             try {
                 socket = serverSocket.accept();
-                System.out.println("in Server "+socket);
+                System.out.println("in Server " + socket);
                 scanner = new Scanner(
                         new BufferedReader(
                                 new InputStreamReader(
@@ -92,7 +92,7 @@ public class Server {
 
 
         printWriter.println(numFields);
-        for (String s: fields)
+        for (String s : fields)
             printWriter.println(s);
         printWriter.println(gameMode);
         printWriter.println(rounds);
@@ -101,22 +101,21 @@ public class Server {
     }
 
 
-
     public void startGame() {
         System.out.println("in server, playernames");
-        for(String s :clientsName) System.out.println(s);
+        for (String s : clientsName) System.out.println(s);
 
         //bring host from last to first of arrayLists
-        Socket lastSocket = sockets.get(sockets.size()-1);
-        sockets.remove(sockets.size()-1);
+        Socket lastSocket = sockets.get(sockets.size() - 1);
+        sockets.remove(sockets.size() - 1);
         sockets.add(0, lastSocket);
 
-        Scanner lastScanner = scanners.get(scanners.size()-1);
-        scanners.remove(scanners.size()-1);
+        Scanner lastScanner = scanners.get(scanners.size() - 1);
+        scanners.remove(scanners.size() - 1);
         scanners.add(0, lastScanner);
 
-        PrintWriter lastPrintWriter = printWriters.get(printWriters.size()-1);
-        printWriters.remove(printWriters.size()-1);
+        PrintWriter lastPrintWriter = printWriters.get(printWriters.size() - 1);
+        printWriters.remove(printWriters.size() - 1);
         printWriters.add(0, lastPrintWriter);
 
 
@@ -127,16 +126,16 @@ public class Server {
         int numPlayers = sockets.size();
         serverPlan = "";
         for (int i = 0; i < rounds; i++) {
-            serverPlan += i%numPlayers;
+            serverPlan += i % numPlayers;
         }
 
         //set and send the plan for determining alphabets via clients
         //for instance,plan: 0100010 means this client should determine the
         //game alphabet in the second and sixth game.
-        for(int i=0; i<numPlayers; i++){
+        for (int i = 0; i < numPlayers; i++) {
             String clientPlan = "";
-            for(int j=0; j<rounds; j++){
-                if(j%numPlayers==i)
+            for (int j = 0; j < rounds; j++) {
+                if (j % numPlayers == i)
                     clientPlan += "1";
                 else
                     clientPlan += "0";
@@ -149,20 +148,90 @@ public class Server {
 
         //ye go to game screen inja buddaaaaaaaaaaaaaaaaaa gozashtam too io.txt file
 
-        new Thread( ()->{ //can be without thread? yes I think
+        new Thread(() -> { //can be without thread? yes I think
             determineAlphabet();
-            checkAnswers();
+            waiteToFinishRoundAndCheckAnswers();
         }).start();
 
     }
 
+
+    int index;
+
+    private void waiteToFinishRoundAndCheckAnswers() {
+        System.out.println("in server, scanner size:"+scanners.size());
+        for (index = 0; index < scanners.size(); index++) {
+            new Thread(() -> {
+                int relatedIndex = index;
+                String message = scanners.get(index).nextLine();
+                System.out.println("message in server form client no." + relatedIndex + ", " + message);
+                if (message.equals("I Finish This Round")) {
+                    new Thread(()->{
+                        scanners.get(relatedIndex).nextLine();
+                    }).start();
+                    //nothing
+                    CollectAndCheckAnswers(index);
+                } else if (message.equals("I Will Send The Answer Now")) {
+                    //nothing
+                }
+            }).start();
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private synchronized void CollectAndCheckAnswers(int finisherIndex) { //index in 3 arrayLists(sockets, scanners, printWriters)
+        if (!didClientsSendAnswers) {
+            didClientsSendAnswers = true;
+
+            new Thread(() -> {
+                //get 1 field answer from all clients and
+                // send back the points they gave for this field
+                // and then go for next field and so on
+                for (int i = 0; i < numFields; i++) {
+                    ArrayList<String> answers = new ArrayList<>();
+                    ArrayList<Integer> points = new ArrayList<>();
+
+                    for (index = 0; index < scanners.size(); index++) {
+                        new Thread(() -> {
+                            String answer = scanners.get(index).nextLine();
+                            answers.add(answer);
+                        }).start();
+
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    points = calculatePoints(answers, fields.get(i));
+
+                    for (int j = 0; j < printWriters.size(); j++) {
+                        printWriters.get(j).println(points.get(j) + "");
+                    }
+
+
+                }
+            }).start();
+
+            for (int j = 0; j < printWriters.size(); j++)
+                printWriters.get(j).println("Send Your Answers");
+
+        }
+
+    }
+
     private void determineAlphabet() {
-        int playerIndex = Integer.parseInt(serverPlan.charAt(thisRound - 1)+""); //because thisRound start from 1
+        int playerIndex = Integer.parseInt(serverPlan.charAt(thisRound - 1) + ""); //because thisRound start from 1
         String alphabetString = scanners.get(playerIndex).nextLine();
         char alphabetChar = alphabetString.charAt(0);
-        if(!usedAlphabets.contains(alphabetChar)){
+        if (!usedAlphabets.contains(alphabetChar)) {
             usedAlphabets.add(alphabetChar);
-            printWriters.get(playerIndex).println(0+""); //code for no problem
+            printWriters.get(playerIndex).println(0 + ""); //code for no problem
 
             try {
                 Thread.sleep(200); // can be omitted? yes 99%
@@ -170,51 +239,35 @@ public class Server {
                 e.printStackTrace();
             }
 
-            sendAlphabet(alphabetChar);
+            sendAlphabetToClients(alphabetChar);
 
-        }else{ //sent alphabet was repeated
-            printWriters.get(playerIndex).println(-1+""); //code for problem
+        } else { //sent alphabet was repeated
+            printWriters.get(playerIndex).println(-1 + ""); //code for problem
             determineAlphabet();
         }
     }
 
-    private void sendAlphabet(char alphabetChar) {
+    private void sendAlphabetToClients(char alphabetChar) {
         for (int i = 0; i < printWriters.size(); i++) {
             printWriters.get(i).println(alphabetChar + "");
         }
     }
 
-    //get 1 field answer from all clients and
-    // send back the points they gave for this field
-    // and then go for next field and so on
-    private void checkAnswers() {
-        for(int i=0; i<numFields; i++) {
-            ArrayList<String> answers = new ArrayList<>();
-            ArrayList<String> points = new ArrayList<>();
-
-            for (int j = 0; j < scanners.size(); j++) {
-                answers.add(scanners.get(j).nextLine());
-            }
-            points = calculatePoints(answers, fields.get(i));
-            for (int j = 0; j < printWriters.size(); j++) {
-                printWriters.get(j).println(points.get(j));
-            }
-
+    private ArrayList<Integer> calculatePoints(ArrayList<String> answers, String category) {
+        ArrayList<Integer> points = new ArrayList<>();
+        for (int i = 0; i < answers.size(); i++) {
+            points.add(5);
         }
-    }
 
-    private ArrayList<String> calculatePoints(ArrayList<String> answers, String category) {
-
-
+        return points;
     }
 
 
     private void sendNotif() {
-        for (PrintWriter p: printWriters) {
+        for (PrintWriter p : printWriters) {
             p.println("go to game");
         }
     }
-
 
 
     public String getHostName() {
