@@ -5,15 +5,19 @@ import io.github.palexdev.materialfx.controls.*;
 import java.io.*;
 import java.util.ArrayList;
 
+import io.github.palexdev.materialfx.controls.legacy.MFXLegacyTableView;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 
-import javax.swing.plaf.TableHeaderUI;
 
 public class CreateGameController {
 
@@ -83,6 +87,10 @@ public class CreateGameController {
     @FXML
     private MFXButton startGameButton;
 
+    @FXML
+    private MFXLegacyTableView<Client> playerNameTableView = new MFXLegacyTableView<>();
+
+    ObservableList<Client> playerNameList ;
 
     public Server server;
 
@@ -112,6 +120,8 @@ public class CreateGameController {
         startGettingClientButton.setOnAction(actionEvent -> {
             isGameCreated = true;
 
+            createTableView();
+
             if (firstnameCheck.isSelected()) fields.add(firstnameCheck.getText());
             if (lastnameCheck.isSelected()) fields.add(lastnameCheck.getText());
             if (cityCheck.isSelected()) fields.add(cityCheck.getText());
@@ -139,14 +149,19 @@ public class CreateGameController {
                 time = (int)timeSlider.getValue() * 60; // add needs //time is set in seconds
 
             server = ServerFactory.createServer(fields, hostName, gameName, password, rounds, mode, time);
-
+            server.setCreateGameController(this);
             new Thread( ()-> {
                 server.startGettingClient();
             }).start();
 
 
-
-            //list view of players
+            //remove created game from database if the window closes
+            Main.mainStage.setOnCloseRequest(windowEvent -> {
+                System.out.println("/////Im closingCreateGame.....");
+                if(server!=null){
+                    databaseHandler.removeServer(server.getPort());
+                }
+            });
 
             System.out.println(fields  + ", gameID = " + server.getPort() + ", hostName: "+ hostName  + ", gameName = " +  gameName  + ", pass: " + password  + ", " + mode  + ", time: " +  time);
 
@@ -179,6 +194,25 @@ public class CreateGameController {
 
     }
 
+    private void createTableView() {
+        playerNameTableView.setVisible(true);
+        playerNameTableView.setDisable(false);
+
+        playerNameList = FXCollections.observableArrayList();
+
+        TableColumn<Client, String> nameCol = new TableColumn<>("Player Name");
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setMinWidth(200);
+        playerNameTableView.getColumns().add(nameCol);
+
+        playerNameTableView.setItems(playerNameList);
+    }
+
+
+    public void addPlayerToBoard(String playerName) {
+        System.out.println("added " + playerName);
+        playerNameList.add(new Client(playerName));
+    }
 
     public void gotoGameScreen(Client client){
 //
@@ -205,14 +239,15 @@ public class CreateGameController {
                     controller.setClient(client);
                     Parent root = fxmlLoader.load();
                     rootPane.getChildren().setAll(root);
+
         //            ((GameScreenController)fxmlLoader.getController()).setClient(client);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+
             });
 //        }).start();
 
     }
-
-
 }

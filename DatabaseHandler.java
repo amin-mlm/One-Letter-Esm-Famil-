@@ -61,12 +61,12 @@ public class DatabaseHandler extends Configs{
         return newPort;
    }
 
-   public void removeServer(int gameId) {
+   public void removeServer(int port) {
        String statement = "DELETE FROM " + Const.GAMES_TABLE + " WHERE " + Const.GAME_PORT + "=?";
-       PreparedStatement preparedStatement = null;
+       PreparedStatement preparedStatement;
        try {
            preparedStatement = getConnection().prepareStatement(statement);
-           preparedStatement.setInt(1, gameId);
+           preparedStatement.setInt(1, port);
 
            preparedStatement.execute();
            preparedStatement.close();

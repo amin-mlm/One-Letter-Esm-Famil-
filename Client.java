@@ -207,6 +207,10 @@ public class Client {
     public int listenToClientScoreForScoreBoard() {
         return Integer.parseInt(scanner.nextLine());
     }
+
+    public void closeGame() throws IOException {
+        socket.close();
+    }
 }
 
 // add needs (if server is not started close window won't be completed )

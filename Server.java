@@ -4,7 +4,6 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Scanner;
 
 public class Server {
@@ -13,6 +12,8 @@ public class Server {
     private String hostName;
     private String gameName;
     private String password;
+
+    private CreateGameController createGameController;
 
     private int rate = 50;
 
@@ -34,11 +35,12 @@ public class Server {
     private ArrayList<Socket> sockets = new ArrayList<>();
     private ArrayList<Scanner> scanners = new ArrayList<>();
     private ArrayList<PrintWriter> printWriters = new ArrayList<>();
-    private ArrayList<String> clientsName = new ArrayList<>();
+
 
 
     private ArrayList<Integer> clientsThisRoundPoints = new ArrayList<>();
     private ArrayList<Integer> clientsSumPoints = new ArrayList<>();
+    private ArrayList<String> clientsName = new ArrayList<>();
 
     public Server(int port, String password, ArrayList<String> fields, String hostName, String gameName, int rounds, String gameMode, int time) {
         this.fields = fields;
@@ -88,12 +90,21 @@ public class Server {
 
             numPlayers++;
 
-            exchangeInfo(scanner, printwriter, numPlayers - 1);
+            String playerName = exchangeInfo(scanner, printwriter, numPlayers - 1);
+
+            createGameController.addPlayerToBoard(playerName);
 
         }
+
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
-    private void exchangeInfo(Scanner scanner, PrintWriter printWriter, int indexBetweenAllPlayers) {
+    private String exchangeInfo(Scanner scanner, PrintWriter printWriter, int indexBetweenAllPlayers) {
         String name = scanner.nextLine();
         clientsName.add(name);
 
@@ -105,6 +116,8 @@ public class Server {
         printWriter.println(gameMode);
         printWriter.println(rounds);
         printWriter.println(time);
+
+        return name;
     }
 
 
@@ -118,30 +131,17 @@ public class Server {
         }
 
         //bring host from last to first of arrayLists
-        sockets.add(0,sockets.get(sockets.size() - 1));
-        sockets.remove(sockets.size()-1);
+        sockets.add(0, sockets.get(sockets.size() - 1));
+        sockets.remove(sockets.size() - 1);
 
-        scanners.add(0,scanners.get(scanners.size() - 1));
-        scanners.remove(scanners.size()-1);
+        scanners.add(0, scanners.get(scanners.size() - 1));
+        scanners.remove(scanners.size() - 1);
 
-        printWriters.add(0,printWriters.get(printWriters.size() - 1));
-        printWriters.remove(printWriters.size()-1);
+        printWriters.add(0, printWriters.get(printWriters.size() - 1));
+        printWriters.remove(printWriters.size() - 1);
 
-        clientsName.add(0,clientsName.get(clientsName.size() - 1));
-        clientsName.remove(clientsName.size()-1);
-
-//        Socket lastSocket = sockets.get(sockets.size() - 1);
-//        sockets.remove(sockets.size() - 1);
-//        sockets.add(0, lastSocket);
-//
-//        Scanner lastScanner = scanners.get(scanners.size() - 1);
-//        scanners.remove(scanners.size() - 1);
-//        scanners.add(0, lastScanner);
-//
-//        PrintWriter lastPrintWriter = printWriters.get(printWriters.size() - 1);
-//        printWriters.remove(printWriters.size() - 1);
-//        printWriters.add(0, lastPrintWriter);
-
+        clientsName.add(0, clientsName.get(clientsName.size() - 1));
+        clientsName.remove(clientsName.size() - 1);
 
         //set plan for server to get alphabet from clients
         //for instance,plan: 0123012 means client index 0 (in scanners list) should
@@ -172,7 +172,7 @@ public class Server {
 
 
         new Thread(() -> { //can be without thread? yes I think
-            sendGoToGameTOCLients();
+            sendGoToGameToClients();
             determineAlphabet();
             waiteToFinishRoundAndCheckAnswers();
         }).start();
@@ -181,7 +181,6 @@ public class Server {
 
 
     int index;
-
     private void waiteToFinishRoundAndCheckAnswers() {
         System.out.println("in server, scanner size:" + scanners.size());
         for (index = 0; index < scanners.size(); index++) {
@@ -201,7 +200,7 @@ public class Server {
                         e.printStackTrace();
                     }
                     //nothing
-                    CollectAndCheckAnswers(relatedIndex);
+                    collectAndCheckAnswers(relatedIndex);
                 } else if (message.equals("I Will Send The Answer Now")) {
                     //nothing
                 }
@@ -214,7 +213,7 @@ public class Server {
         }
     }
 
-    private synchronized void CollectAndCheckAnswers(int finisherIndex) { //index in 3 arrayLists(sockets, scanners, printWriters)
+    private synchronized void collectAndCheckAnswers(int finisherIndex) { //index in 3 arrayLists(sockets, scanners, printWriters)
         new Thread(() -> {
             //get 1 field answer from all clients and
             // send back the points they are given for this
@@ -273,6 +272,7 @@ public class Server {
 
 
             }
+
             //(15s) see their points +
             // (1s) server wants to send s.t after
             // sleep, so clients should be ready for it
@@ -283,49 +283,38 @@ public class Server {
             }
 
             if (++thisRound <= rounds) {
-                for (int i = 0; i < printWriters.size(); i++) {
-                    printWriters.get(i).println(clientsThisRoundPoints.get(i) + "");
-                }
-                for (int j = 0; j < clientsThisRoundPoints.size(); j++) {
-                    clientsThisRoundPoints.set(j, 0);
-                }
+                sendRoundScoreToClients(); //and set the array "clientsThisRoundPoints" to 0
                 nextRound();
             } else {
-                //send round scores to all clients
-                for (int i = 0; i < printWriters.size(); i++) {
-                    printWriters.get(i).println(clientsThisRoundPoints.get(i) + "");
-                }
+                sendRoundScoreToClients();
 
                 //sort clients name by final score
-outer:          for (int i = 0; i < clientsSumPoints.size(); i++) {
+                outer:
+                for (int i = 0; i < clientsSumPoints.size(); i++) {
                     boolean shouldBreak = true;
                     for (int j = 0; j < clientsSumPoints.size() - 1; j++) {
-                        if(clientsSumPoints.get(j) < clientsSumPoints.get(j+1)){
+                        if (clientsSumPoints.get(j) < clientsSumPoints.get(j + 1)) {
                             int tempScore = clientsSumPoints.get(j);
-                            clientsSumPoints.set(j, clientsSumPoints.get(j+1));
-                            clientsSumPoints.set(j+1, tempScore);
+                            clientsSumPoints.set(j, clientsSumPoints.get(j + 1));
+                            clientsSumPoints.set(j + 1, tempScore);
 
                             String tempName = clientsName.get(j);
-                            clientsName.set(j, clientsName.get(j+1));
-                            clientsName.set(j+1, tempName);
+                            clientsName.set(j, clientsName.get(j + 1));
+                            clientsName.set(j + 1, tempName);
 
                             shouldBreak = false;
-                        }
-                        else if( j==clientsSumPoints.size() - 2 && shouldBreak){
+                        } else if (j == clientsSumPoints.size() - 2 && shouldBreak) {
                             break outer;
                         }
-                        
+
                     }
                 }
 
-                //send final scores to all clients
-                for (int i = 0; i < numPlayers; i++) {
-                    for (int j = 0; j < numPlayers; j++) {
-                        printWriters.get(i).println(clientsName.get(j));
-                        printWriters.get(i).println(clientsSumPoints.get(j));
-                    }
-                }
 
+                sendScoreBoardToClients();
+
+
+                closeCurrentGame();
             }
 
 
@@ -333,6 +322,40 @@ outer:          for (int i = 0; i < clientsSumPoints.size(); i++) {
 
         for (int j = 0; j < printWriters.size(); j++)
             printWriters.get(j).println("Send Your Answers");
+    }
+
+
+    private void closeCurrentGame() {
+        //disconnect sockets
+        for (int i = 0; i < sockets.size(); i++) {
+            try {
+                sockets.get(i).close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //remove game from database
+        new DatabaseHandler().removeServer(port);
+    }
+
+
+    private void sendScoreBoardToClients() {
+        for (int i = 0; i < numPlayers; i++) {
+            for (int j = 0; j < numPlayers; j++) {
+                printWriters.get(i).println(clientsName.get(j));
+                printWriters.get(i).println(clientsSumPoints.get(j));
+            }
+        }
+    }
+
+    private void sendRoundScoreToClients() {
+        for (int i = 0; i < printWriters.size(); i++) {
+            printWriters.get(i).println(clientsThisRoundPoints.get(i) + "");
+        }
+        for (int j = 0; j < clientsThisRoundPoints.size(); j++) {
+            clientsThisRoundPoints.set(j, 0);
+        }
     }
 
     private void nextRound() {
@@ -453,7 +476,7 @@ outer:          for (int i = 0; i < clientsSumPoints.size(); i++) {
         }
     }
 
-    private void sendGoToGameTOCLients() {
+    private void sendGoToGameToClients() {
         for (PrintWriter p : printWriters) {
             p.println("go to game");
         }
@@ -483,5 +506,10 @@ outer:          for (int i = 0; i < clientsSumPoints.size(); i++) {
     public int getPort() {
         return port;
     }
+
+    public void setCreateGameController(CreateGameController createGameController) {
+        this.createGameController = createGameController;
+    }
+
 }
 

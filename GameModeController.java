@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
 public class GameModeController {
 
@@ -21,9 +22,9 @@ public class GameModeController {
 
     static FXMLLoader fxmlLoader;
 
-
     @FXML
     void initialize() {
+
 //        BackgroundImage myBI1= new BackgroundImage(new Image("C:\\Users\\USER\\Desktop\\java desktop\\esmFamilAll\\newEsmFamil2\\src\\main\\resources\\com\\example\\newesmfamil2\\assets\\no1.jpg",170,83,false,true),
 //                BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,
 //                BackgroundSize.DEFAULT);
@@ -44,6 +45,8 @@ public class GameModeController {
             }
         });
 
+
+
         joinButton.setOnAction(actionEvent -> {
             fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/joinGame.fxml"));
             try {
@@ -52,8 +55,6 @@ public class GameModeController {
                 e.printStackTrace();
             }
         });
-
-
     }
 
 }

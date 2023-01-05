@@ -2,6 +2,7 @@ package com.example.newesmfamil2;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -13,12 +14,15 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
 
 public class GameScreenController {
 
@@ -52,9 +56,11 @@ public class GameScreenController {
     @FXML
     private MFXLegacyListView<Client> scoreBoardListView;
 
-//    @FXML
-//    private MFXLegacyTableView<String> resultTable;
+    @FXML
+    private MFXButton newGameButton;
 
+    @FXML
+    private MFXButton exitButton;
 
     static Client client;
 
@@ -132,7 +138,21 @@ public class GameScreenController {
                     client.sendFinishState();
             }
         });
+
+        newGameButton.setOnAction(actionEvent -> {
+            closeCurrentGame();
+            newGame();
+        });
+
+        exitButton.setOnAction(actionEvent -> {
+            closeCurrentGame();
+            exitButton.getScene().getWindow().hide();
+        });
+
+
     }
+
+
 
     private int sendAlphabet() {
 
@@ -250,8 +270,18 @@ public class GameScreenController {
                     scoreBoardListView.setCellFactory(param -> new ClientCellController());
 
 
+
                     //add needs
 
+                    // next Game
+
+
+
+                    newGameButton.setVisible(true);
+                    newGameButton.setDisable(false);
+
+                    exitButton.setVisible(true);
+                    exitButton.setDisable(false);
 
 
                 }
@@ -282,6 +312,25 @@ public class GameScreenController {
         }
     }
 
+    private void newGame() {
+        scoreBoardListView.setVisible(false);
+        scoreBoardListView.setDisable(true);
+
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("com/example/newesmfamil2/gameMode.fxml"));
+        try {
+            rootPane.getChildren().setAll((Pane)(fxmlLoader.load()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void closeCurrentGame() {
+        try {
+            client.closeGame();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private String removeSpaceFromAnswer(String primaryAnswer) {
         if(primaryAnswer.equals("")) return primaryAnswer;
