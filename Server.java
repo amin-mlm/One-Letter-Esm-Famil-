@@ -28,7 +28,7 @@ public class Server {
     boolean isGettingClientEnough = false;
     boolean didClientsSendAnswers = false;
 
-    int numPlayers=0;
+    int numPlayers = 0;
 
     private ArrayList<Socket> sockets = new ArrayList<>();
     private ArrayList<Scanner> scanners = new ArrayList<>();
@@ -155,11 +155,10 @@ public class Server {
                     clientPlan += "0";
             }
             printWriters.get(i).println(clientPlan);
-            printWriters.get(i).println(numPlayers+"");
-            printWriters.get(i).println(i+"");
+            printWriters.get(i).println(numPlayers + "");
+            printWriters.get(i).println(i + "");
 
         }
-
 
 
         new Thread(() -> { //can be without thread? yes I think
@@ -174,15 +173,15 @@ public class Server {
     int index;
 
     private void waiteToFinishRoundAndCheckAnswers() {
-        System.out.println("in server, scanner size:"+scanners.size());
+        System.out.println("in server, scanner size:" + scanners.size());
         for (index = 0; index < scanners.size(); index++) {
             new Thread(() -> {
                 int relatedIndex = index;
-                System.out.println("in server, listener is set for index, " +  relatedIndex);
+                System.out.println("in server, listener is set for index, " + relatedIndex);
                 String message = scanners.get(relatedIndex).nextLine();
                 System.out.println("message in server form client no." + relatedIndex + ", " + message);
                 if (message.equals("I Finish This Round")) {
-                    new Thread(()->{
+                    new Thread(() -> {
                         System.out.println("relatedIndex of finisher: " + relatedIndex);
                         scanners.get(relatedIndex).nextLine();
                     }).start();
@@ -212,7 +211,7 @@ public class Server {
             // field and then go to next field and so on
             for (int i = 0; i < numFields; i++) {
 
-                System.out.println("\nfield: " + (i + 1) );
+                System.out.println("\nfield: " + (i + 1));
                 ArrayList<String> answers = new ArrayList<>();
                 ArrayList<String> points = new ArrayList<>();
 
@@ -236,48 +235,51 @@ public class Server {
                     }
                 }
                 System.out.println("server, checking answers: " + answers);
-                points = calculatePoints(answers, fields.get(i));
+                points = getReactionsAndCalculatePoints(answers, fields.get(i));
 
+                //send clients points
                 for (int j = 0; j < printWriters.size(); j++) {
                     printWriters.get(j).println(points.get(j));
                 }
 
                 for (int j = 0; j < points.size(); j++) {
-                    clientsThisRoundPoints.set(j, clientsSumPoints.get(j) + Integer.parseInt(points.get(j)));
-
+                    clientsThisRoundPoints.set(j, clientsThisRoundPoints.get(j) + Integer.parseInt(points.get(j)));
                     clientsSumPoints.set(j, clientsSumPoints.get(j) + Integer.parseInt(points.get(j)));
                 }
 
 
-                if(i==fields.size()-1)
-                    try {
-                        Thread.sleep(16000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                else
-                    try {
-                        Thread.sleep(14000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//                if (i == fields.size() - 1)
+//                    try {
+//                        Thread.sleep(16000); //1 + 15(see their points)
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                else
+//                    try {
+//                        Thread.sleep(14000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
 
 
             }
+            try {
+                Thread.sleep(16000); //1 + 15(see their points)
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-            if(++thisRound<=rounds){
-                ///clientsThisRoundPoints=0 shavac
+            if (++thisRound <= rounds) {
                 for (int i = 0; i < printWriters.size(); i++) {
-                    printWriters.get(i).println(clientsThisRoundPoints.get(i)+"");
+                    printWriters.get(i).println(clientsThisRoundPoints.get(i) + "");
                 }
                 for (int j = 0; j < clientsThisRoundPoints.size(); j++) {
                     clientsThisRoundPoints.set(j, 0);
                 }
                 nextRound();
-            }else{
+            } else {
 
             }
-
 
 
         }).start();
@@ -292,26 +294,26 @@ public class Server {
     }
 
 
-    private ArrayList<String> calculatePoints(ArrayList<String> answers, String category) {
+    private ArrayList<String> getReactionsAndCalculatePoints(ArrayList<String> answers, String category) {
         ArrayList<ArrayList<String>> allReactions = new ArrayList<>();
         for (index = 0; index < numPlayers; index++) {
             ArrayList<String> reactionsOfOnePlayer = new ArrayList<>();
             for (int i = 0; i < numPlayers; i++) {
-                if(index==i)
+                if (index == i)
                     continue;
                 System.out.println("send answer: " + answers.get(i) + " to client no." + index);
                 printWriters.get(index).println(answers.get(i));
             }
-            new Thread(()->{
+            new Thread(() -> {
                 int relatedIndex = index;
-                System.out.println("server 260, relatedIndex : " + relatedIndex);
+                System.out.println("server 260-307, relatedIndex : " + relatedIndex);
 
+                System.out.println("server, listening ... for reaction of player " + relatedIndex);
                 for (int i = 0; i < numPlayers; i++) {
-                    if(i==relatedIndex){
+                    if (i == relatedIndex) {
                         reactionsOfOnePlayer.add("Positive");
                         continue;
                     }
-                    System.out.println("server, listening ... for reaction of player "+ relatedIndex);
                     String reaction = scanners.get(relatedIndex).nextLine();
                     System.out.println("reaction of player " + relatedIndex + "to player " + i + " is: " + reaction);
                     reactionsOfOnePlayer.add(reaction);
@@ -327,7 +329,7 @@ public class Server {
 
         }
 
-        while (allReactions.size()!=numPlayers){
+        while (allReactions.size() != numPlayers) {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
@@ -340,14 +342,14 @@ public class Server {
         for (int i = 0; i < numPlayers; i++) {
             int positiveReactions = 0;
             for (int j = 0; j < numPlayers; j++) {
-                if(i!=j && allReactions.get(j).get(i).equals("Positive")){
+                if (i != j && allReactions.get(j).get(i).equals("Positive")) {
                     positiveReactions++;
                 }
             }
             System.out.println("pos. reactions to i " + i + " is: " + positiveReactions);
-            if(((double)positiveReactions / (numPlayers -1)) >= ((double)rate / 100)){
+            if (((double) positiveReactions / (numPlayers - 1)) >= ((double) rate / 100)) {
                 filteredAnswers.add(answers.get(i));
-            }else{
+            } else {
                 filteredAnswers.add("");
             }
         }
@@ -355,37 +357,20 @@ public class Server {
         System.out.println("SOO filteredAnswers " + filteredAnswers);
         return checkSimilarities(filteredAnswers);
 
-
-
-//        int n = answers.size();
-//        ArrayList<Integer> points = new ArrayList<>();
-//        for (int i = 0; i < n; i++) {
-//            for (int j = 0; j < n; j++) {
-//                if(i!=j && answers.get(i).equals(answers.get(j))){
-//                    points.add(5);
-//                    break;
-//                }
-//                if(j==n-1)
-//                    points.add(10);
-//            }
-//        }
-//
-//        return points;
     }
 
     private ArrayList<String> checkSimilarities(ArrayList<String> answers) {
         ArrayList<String> points = new ArrayList<>();
         for (int i = 0; i < numPlayers; i++) {
-            if(answers.get(i).equals(""))
-                points.add(0+"");
+            if (answers.get(i).equals(""))
+                points.add(0 + "");
             else
                 for (int j = 0; j < numPlayers; j++) {
-                    if(i!=j && answers.get(i).equals(answers.get(j))){
-                        points.add(5+"");
+                    if (i != j && answers.get(i).equals(answers.get(j))) {
+                        points.add(5 + "");
                         break;
-                    }
-                    else if(j==numPlayers-1)
-                        points.add(10+"");
+                    } else if (j == numPlayers - 1)
+                        points.add(10 + "");
                 }
         }
         return points;

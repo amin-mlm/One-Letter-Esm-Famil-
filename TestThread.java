@@ -20,16 +20,29 @@ public class TestThread {
 //            Thread.sleep(1);
 //        }
 
+//        ArrayList<Integer> aa = new ArrayList<>();
+//        aa.add(10);
+//        aa.add(11);
+//        aa.add(12);
+//        System.out.println(aa);
+//
+////        int temp = aa.get(1);
+////        aa.remove(1);
+////        aa.add(1, 5+temp);
+//        aa.set(1, 16);
+//        System.out.println(aa);
         ArrayList<Integer> aa = new ArrayList<>();
         aa.add(10);
         aa.add(11);
         aa.add(12);
+        aa.add(13);
         System.out.println(aa);
 
-//        int temp = aa.get(1);
-//        aa.remove(1);
-//        aa.add(1, 5+temp);
-        aa.set(1, 16);
+        while (aa.size()!=0){
+            aa.remove(0);
+        }
+
         System.out.println(aa);
+
     }
 }

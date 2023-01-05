@@ -63,9 +63,6 @@ public class CreateGameController {
     private MFXTextField passwordField;
 
     @FXML
-    private MFXButton singleGameButton;
-
-    @FXML
     private MFXTextField roundsField;
 
     @FXML
@@ -78,6 +75,9 @@ public class CreateGameController {
     private MFXSlider timeSlider;
 
     @FXML
+    private MFXButton singleGameButton;
+
+    @FXML
     private MFXButton startGettingClientButton;
 
     @FXML
@@ -88,6 +88,7 @@ public class CreateGameController {
 
     static DatabaseHandler databaseHandler = new DatabaseHandler();
 
+    private boolean isGameCreated = false; //will be true when "startGettingClientButton" is pressed;
 
     @FXML
     void initialize() {
@@ -109,6 +110,8 @@ public class CreateGameController {
 
         //also, eventFilter can be implemented to consume event in some situations
         startGettingClientButton.setOnAction(actionEvent -> {
+            isGameCreated = true;
+
             if (firstnameCheck.isSelected()) fields.add(firstnameCheck.getText());
             if (lastnameCheck.isSelected()) fields.add(lastnameCheck.getText());
             if (cityCheck.isSelected()) fields.add(cityCheck.getText());
@@ -154,7 +157,6 @@ public class CreateGameController {
         //enough button
         //also, eventFilter can be implemented to consume event in some situations
         startGameButton.setOnAction(actionEvent -> {
-
             server.isGettingClientEnough = true;
             Client client = new Client(gameNameField.getText());
 

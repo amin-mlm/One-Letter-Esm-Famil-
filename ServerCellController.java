@@ -74,10 +74,6 @@ public class ServerCellController extends MFXLegacyListCell<Server> {
                 }
             });
 
-
-
-
-
             setText(null);
             setGraphic(rootPane);
         }

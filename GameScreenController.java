@@ -55,6 +55,8 @@ public class GameScreenController {
 
     private ArrayList<MFXTextField> textFields = new ArrayList<>();
 
+    private ArrayList<VBox> reactionRadioButtons = new ArrayList<>();
+
     private int rounds;
 
     private String gameMode;
@@ -106,7 +108,14 @@ public class GameScreenController {
         });
 
         finishButton.setOnAction(actionEvent -> {
-            client.sendFinishState();
+            for (int i = 0; i < textFields.size(); i++) {
+                if(textFields.get(i).getText().equals("")){
+                    //add needs
+                    break;
+                }
+                if(i==fieldsString.size()-1)
+                    client.sendFinishState();
+            }
         });
     }
 
@@ -148,8 +157,8 @@ public class GameScreenController {
                 Platform.runLater(() -> {
                     finishButton.setVisible(false);
                     finishButton.setDisable(true);
-                    for (int i = 0; i < textFields.size(); i++) {
-                        textFields.get(i).setDisable(true);
+                    for (MFXTextField textField : textFields) {
+                        textField.setDisable(true);
                     }
                 });
 
@@ -171,16 +180,18 @@ public class GameScreenController {
                     ArrayList<String> othersAnswers = client.sendAnswerAndGetOthersAnswers(textFields.get(i).getText());
 
                     System.out.println("gameScreen, othersAnswer: " + othersAnswers);
+
                     int point = sendReactionAndGetPoint(othersAnswers, fieldsString.get(i));
 
                     String tempAnswer = textFields.get(i).getText();
                     textFields.get(i).setText(tempAnswer + ", " + point);
 
-                    try {
-                        Thread.sleep(15000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        Thread.sleep(15000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+                    showTime(15);
 
 
                     // add needs
@@ -190,7 +201,7 @@ public class GameScreenController {
 
                 if(++thisRound<=rounds){
 
-                    showNextRoundMessage();
+                    prepareNextRound();
                     nextRound();
 
                 }/*else{
@@ -244,14 +255,14 @@ public class GameScreenController {
         }
     }
 
-    private void showNextRoundMessage() {
+    private void prepareNextRound() {
         int thisRoundScore = client.listenToRoundScore();
         stateLabel.setVisible(true);
         stateLabel.setDisable(false);
 
 
         Platform.runLater(()->{
-            alphabetLabel.setText("Go With ' " + alphabet + " '");
+            alphabetLabel.setText(""); /*Go With ' " + alphabet + " '*/
             stateLabel.setText("You Got  " + thisRoundScore + "  In This Round !" +
                     "\nWaite For The Next Round");
         });
@@ -263,10 +274,27 @@ public class GameScreenController {
             textFields.get(i).setText("");
         }
 
-        stateLabel.setVisible(false);
-        stateLabel.setDisable(true);
+        System.out.println("-----(before)reactionRadioButtons.size() when removing: " + reactionRadioButtons.size());
+        System.out.println("-----(before)reactionPane.size() when removing: " + reactionPane.getChildren().size());
+        while (reactionRadioButtons.size()!=0) {
+            Platform.runLater(()->{
+                reactionPane.getChildren().remove(0);
+            });
+            reactionRadioButtons.remove(0);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("-----(after)reactionRadioButtons.size() when removing: " + reactionRadioButtons.size());
+        System.out.println("-----(after)reactionPane.size() when removing: " + reactionPane.getChildren().size());
+
 
         showTime(10);
+
+        stateLabel.setVisible(false);
+        stateLabel.setDisable(true);
 
     }
     private void nextRound() {
@@ -282,7 +310,7 @@ public class GameScreenController {
         }
     }
 
-    private int sendReactionAndGetPoint(ArrayList<String> othersAnswers, String category) {
+    private int sendReactionAndGetPoint(ArrayList<String> othersAnswers, String category)  {
         fieldPane.setVisible(false);
         fieldPane.setDisable(true);
 
@@ -315,7 +343,10 @@ public class GameScreenController {
             radioButtonNo.setToggleGroup(toggle);
             toggleGroups.add(toggle);
 
+
             vBox.getChildren().addAll(answer, radioButtonYes, radioButtonNo);
+
+            reactionRadioButtons.add(vBox);
 
             System.out.println("toggleGroups.size() is " + toggleGroups.size());
             Platform.runLater(()->{
@@ -323,15 +354,6 @@ public class GameScreenController {
             });
         }
 
-//        Thread thread = new Thread(()->{ //can without thread?
-//            showTime(7 * othersAnswers.size() + 10 /*add needs (just delete this)*/);
-//        });
-//        thread.start();
-//        try {
-//            thread.join();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
         showTime(7 * othersAnswers.size() + 10 /*add needs (just delete this)*/);
 
 
@@ -358,7 +380,7 @@ public class GameScreenController {
         }
 
         try {
-            Thread.sleep(1000); //"Yes" automatically checked is visible on screen
+            Thread.sleep(1000); //"Yes" ticked automatically is visible on screen
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -372,6 +394,11 @@ public class GameScreenController {
 //        stateLabel.setVisible(false);
 //        stateLabel.setDisable(true);
 
+        try {
+            Thread.sleep(10 * indexBetweenAllPlayers);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return client.sendReactionsAndGetPoint(reactions);
 
     }
