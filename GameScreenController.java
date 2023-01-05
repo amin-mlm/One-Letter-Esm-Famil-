@@ -61,18 +61,21 @@ public class GameScreenController {
         fieldPane.setAlignment(Pos.CENTER);
         fieldPane.setHgap(10);
 
+        timeLabel.setVisible(true);
+        timeLabel.setDisable(false);
+        showTime();
 
-        for(String s : fieldsString){
-            MFXTextField textField = new MFXTextField();
-            textField.setFloatingText(s);
-            textField.setPrefHeight(60);
-            textField.setPrefWidth(120);
+//        for(String s : fieldsString){
+//            MFXTextField textField = new MFXTextField();
+//            textField.setFloatingText(s);
+//            textField.setPrefHeight(60);
+//            textField.setPrefWidth(120);
+//
+//            textFields.add(textField);
+//            fieldPane.getChildren().add(textField);
+//        }
 
-            textFields.add(textField);
-            fieldPane.getChildren().add(textField);
-        }
-
-
+/*
         if(gameMode.equals("Game Is Finished When The Time Is Over")){
             System.out.println("game is timeyy");
             timeLabel.setVisible(true);
@@ -81,17 +84,17 @@ public class GameScreenController {
                     showTime();
 
             }).start();
-        }/*else{
+        }*//*else{
             finishButton.setOnAction(actionEvent -> {
                 System.out.println(fields.get(1).getText());
             });
         }*/
 
         System.out.println("continue after thread");
-
-        pressBtn.setOnAction(actionEvent -> {
-            System.out.println(textFields.get(1).getText());
-        });
+//
+//        pressBtn.setOnAction(actionEvent -> {
+//            System.out.println(textFields.get(1).getText());
+//        });
 
     }
 

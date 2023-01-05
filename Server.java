@@ -104,6 +104,13 @@ public class Server {
 
 
         sendNotif();
+
+
+        //add s.t r for start game
+
+
+
+
 //
 //        new Thread( ()->{
 //            Platform.runLater( ()->{
