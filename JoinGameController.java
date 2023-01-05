@@ -37,7 +37,7 @@ public class JoinGameController {
     @FXML
     void initialize() {
         ArrayList<Server> servers = databaseHandler.showServers();
-        System.out.println("in JoinGameContro: " + servers.size() + " servers exist");
+        System.out.println("in JoinGameContro: " + servers);
         serversObservableList = FXCollections.observableArrayList();
         for(Server server : servers){
             serversObservableList.add(server);
@@ -51,21 +51,16 @@ public class JoinGameController {
     }
 
     public void joinToServer(int gameId){
-        System.out.println("game choosed");
         //if client name was empty add needs
         String clientName = clientNameField.getText();
 
-        // add needs for welcome
         sayWelcome(gameId);
 
         Client client = new Client(clientName);
 
-
         new Thread( ()->{
             client.joinToServer(gameId);
-            Platform.runLater(()->{
-                client.waiteForStart();
-            });
+            client.waiteForStart();
         }).start();
 
 
@@ -77,27 +72,35 @@ public class JoinGameController {
     }
 
     public void gotoGameScreen(Client client){
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
-        try {
-            Parent root = fxmlLoader.load();
-            rootPane.getChildren().setAll(root);
-            //            ((GameScreenController)fxmlLoader.getController()).setClient(client);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new Thread(()->{
+            Platform.runLater(()->{
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
+                try {
+                    Parent root = fxmlLoader.load();
+                    rootPane.getChildren().setAll(root);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
+        }).start();
+//
+//        new Thread(()->{
+//            Platform.runLater(()->{
+//                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
+//                GameScreenController controller = new GameScreenController();
+//                try {
+//                    fxmlLoader.setController(controller);
+//                    controller.setClient(client);
+//                    Parent root = fxmlLoader.load();
+//                    rootPane.getChildren().setAll(root);
+//        //            ((GameScreenController)fxmlLoader.getController()).setClient(client);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            });
+//        }).start();
 
-//        FXMLLoader fxmlLoader = new FXMLLoader(JoinGameController.class.getResource("/com/example/newesmfamil2/gameScreen.fxml"));
-//        GameScreenController controller = new GameScreenController();
-//        try {
-//            fxmlLoader.setController(controller);
-//            controller.setClient(client);
-//            Parent root = fxmlLoader.load();
-//            rootPane.getChildren().setAll(root);
-////            ((GameScreenController)fxmlLoader.getController()).setClient(client);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
 

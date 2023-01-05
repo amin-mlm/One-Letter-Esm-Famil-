@@ -62,11 +62,12 @@ public class ServerCellController extends MFXLegacyListCell<Server> {
 
             startButton.setOnAction(actionEvent ->{
                 if(passField.getText().equals(item.getPassword())){
-                    new Thread( ()->{
-                        Platform.runLater(()->{
+//                    new Thread(()->{
+//                        Platform.runLater(()->{
                             ((JoinGameController)(GameModeController.fxmlLoader.getController())).joinToServer(item.getPort());
-                        });
-                    }).start();
+//                        });
+//                    }).start();
+//                    JoinGameController.waiteToStartGame(item.getId());
                 }
                 else{
                     // add needs

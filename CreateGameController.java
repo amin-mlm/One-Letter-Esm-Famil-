@@ -160,9 +160,9 @@ public class CreateGameController {
 
             new Thread( ()->{
                 client.joinToServer(server.getPort());
-                Platform.runLater(()->{
                     client.waiteForStart();
-                });
+//                Platform.runLater(()->{
+//                });
             }).start();
             try {
                 Thread.sleep(200);
@@ -170,7 +170,7 @@ public class CreateGameController {
                 e.printStackTrace();
             }
 
-            new Thread( ()->{ //can be without thread? yes I think - no i think because of start checking answers
+            new Thread( ()->{ //can be without thread? yes I think
                 server.startGame();
             }).start();
 
@@ -180,27 +180,36 @@ public class CreateGameController {
 
 
     public void gotoGameScreen(Client client){
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
-        try {
-            Parent root = fxmlLoader.load();
-            rootPane.getChildren().setAll(root);
-            //            ((GameScreenController)fxmlLoader.getController()).setClient(client);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-//        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
-//        GameScreenController controller = new GameScreenController();
-//        try {
-//            fxmlLoader.setController(controller);
-//            controller.setClient(client);
-//            Parent root = fxmlLoader.load();
-//            rootPane.getChildren().setAll(root);
-//    //            ((GameScreenController)fxmlLoader.getController()).setClient(client);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        new Thread(()->{
+            Platform.runLater(()->{
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
+                try {
+                    Parent root = fxmlLoader.load();
+                    rootPane.getChildren().setAll(root);
+        //            ((GameScreenController)fxmlLoader.getController()).setClient(client);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
+            });
+        }).start();
+
+//        new Thread(()->{
+//            Platform.runLater(()->{
+//                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
+//                GameScreenController controller = new GameScreenController();
+//                try {
+//                    fxmlLoader.setController(controller);
+//                    controller.setClient(client);
+//                    Parent root = fxmlLoader.load();
+//                    rootPane.getChildren().setAll(root);
+//        //            ((GameScreenController)fxmlLoader.getController()).setClient(client);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            });
+//        }).start();
 
     }
 

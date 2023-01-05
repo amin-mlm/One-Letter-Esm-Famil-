@@ -94,3 +94,5 @@ public class Client {
         return time;
     }
 }
+
+// add needs (if server is not started close window won't be completed )

@@ -42,6 +42,7 @@ public class GameScreenController {
 
     private int time;
 
+    private long secondTime;
 
 
 
@@ -63,7 +64,11 @@ public class GameScreenController {
 
         timeLabel.setVisible(true);
         timeLabel.setDisable(false);
-        showTime();
+
+        new Thread(()->{
+            showTime();
+
+        }).start();
 
 //        for(String s : fieldsString){
 //            MFXTextField textField = new MFXTextField();
@@ -75,8 +80,8 @@ public class GameScreenController {
 //            fieldPane.getChildren().add(textField);
 //        }
 
-/*
-        if(gameMode.equals("Game Is Finished When The Time Is Over")){
+
+        /*if(gameMode.equals("Game Is Finished When The Time Is Over")){
             System.out.println("game is timeyy");
             timeLabel.setVisible(true);
             timeLabel.setDisable(false);
@@ -91,7 +96,7 @@ public class GameScreenController {
         }*/
 
         System.out.println("continue after thread");
-//
+
 //        pressBtn.setOnAction(actionEvent -> {
 //            System.out.println(textFields.get(1).getText());
 //        });
@@ -100,26 +105,33 @@ public class GameScreenController {
 
     private void showTime(){
 
-        Platform.runLater(()->{
             int wholeTimeInSecond = 5;
 
             long firstTime = (long) (System.nanoTime() / Math.pow(10, 9));
+            System.out.println("first time " + firstTime);
 
-            long secondTime;
+            secondTime = firstTime;
             do {
                 System.out.println("do show time started");
-                secondTime = (long) (System.nanoTime() / Math.pow(10, 9));
 
-                timeLabel.setText((wholeTimeInSecond + firstTime - secondTime) / 60 + ":" + (wholeTimeInSecond + firstTime - secondTime) % 60);
+                Platform.runLater(()->{
+                    timeLabel.setText((wholeTimeInSecond + firstTime - secondTime) / 60 + ":" + (wholeTimeInSecond + firstTime - secondTime) % 60);
+                });
 
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
+                secondTime = (long) (System.nanoTime() / Math.pow(10, 9));
+                System.out.println("second time " + secondTime);
+
+
+
+                System.out.println();
             } while (secondTime - firstTime <= wholeTimeInSecond);
             System.out.println("show time finish");
-        });
     }
 
 
