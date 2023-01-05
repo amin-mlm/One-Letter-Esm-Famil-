@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class Server {
@@ -117,17 +118,29 @@ public class Server {
         }
 
         //bring host from last to first of arrayLists
-        Socket lastSocket = sockets.get(sockets.size() - 1);
-        sockets.remove(sockets.size() - 1);
-        sockets.add(0, lastSocket);
+        sockets.set(0,sockets.get(sockets.size() - 1));
+        sockets.remove(sockets.size()-1);
 
-        Scanner lastScanner = scanners.get(scanners.size() - 1);
-        scanners.remove(scanners.size() - 1);
-        scanners.add(0, lastScanner);
+        scanners.set(0,scanners.get(scanners.size() - 1));
+        scanners.remove(scanners.size()-1);
 
-        PrintWriter lastPrintWriter = printWriters.get(printWriters.size() - 1);
-        printWriters.remove(printWriters.size() - 1);
-        printWriters.add(0, lastPrintWriter);
+        printWriters.set(0,printWriters.get(printWriters.size() - 1));
+        printWriters.remove(printWriters.size()-1);
+
+        clientsName.set(0,clientsName.get(clientsName.size() - 1));
+        clientsName.remove(clientsName.size()-1);
+
+//        Socket lastSocket = sockets.get(sockets.size() - 1);
+//        sockets.remove(sockets.size() - 1);
+//        sockets.add(0, lastSocket);
+//
+//        Scanner lastScanner = scanners.get(scanners.size() - 1);
+//        scanners.remove(scanners.size() - 1);
+//        scanners.add(0, lastScanner);
+//
+//        PrintWriter lastPrintWriter = printWriters.get(printWriters.size() - 1);
+//        printWriters.remove(printWriters.size() - 1);
+//        printWriters.add(0, lastPrintWriter);
 
 
         //set plan for server to get alphabet from clients
@@ -278,6 +291,20 @@ public class Server {
                 }
                 nextRound();
             } else {
+                //sort clients name by final score
+                for (int i = 0; i < clientsSumPoints.size(); i++) {
+                    for (int j = 0; j < clientsSumPoints.size(); j++) {
+                        if(clientsSumPoints.get(i).)
+                    }
+                }
+                //send final scores to all clients
+                for (int i = 0; i < numPlayers; i++) {
+                    for (int j = 0; j < numPlayers; j++) {
+                        printWriters.get(i).println(clientsName.get(j));
+                        printWriters.get(i).println(clientsSumPoints.get(j));
+
+                    }
+                }
 
             }
 

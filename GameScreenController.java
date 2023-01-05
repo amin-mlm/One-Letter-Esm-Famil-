@@ -6,8 +6,10 @@ import java.util.ArrayList;
 
 import io.github.palexdev.materialfx.controls.MFXRadioButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
-import io.github.palexdev.materialfx.controls.legacy.MFXLegacyTableView;
+import io.github.palexdev.materialfx.controls.legacy.MFXLegacyListView;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -45,6 +47,9 @@ public class GameScreenController {
     @FXML
     private Label stateLabel;
 
+    @FXML
+    private MFXLegacyListView<Client> scoreBoardListView;
+
 //    @FXML
 //    private MFXLegacyTableView<String> resultTable;
 
@@ -76,6 +81,8 @@ public class GameScreenController {
     private int index;
 
     private boolean myTurnToDetermineAlphabet;
+
+    private int sumScore = 0;
 
 
     @FXML
@@ -189,6 +196,8 @@ public class GameScreenController {
 
                     int point = sendReactionAndGetPoint(othersAnswers, fieldsString.get(i));
 
+                    sumScore += point;
+
                     String tempAnswer = textFields.get(i).getText();
                     textFields.get(i).setText(tempAnswer + ", " + point);
 
@@ -203,14 +212,31 @@ public class GameScreenController {
                     nextRound();
 
                 }else{
-//                    int sumScore = client.listenToSumScore();
-//                    int finalState = client.listenToFinalState();
-                    ArrayList<String> names = new ArrayList<>();
-                    ArrayList<Integer> scores = new ArrayList<>();
+                    fieldPane.setVisible(false);
+                    fieldPane.setDisable(true);
+
+                    alphabetLabel.setVisible(false);
+                    alphabetLabel.setDisable(true);
+
+                    scoreBoardListView.setVisible(true);
+                    scoreBoardListView.setDisable(false);
+
+                    client.setFinalScore(sumScore);
+
+                    ObservableList<Client> clientsObservableList = FXCollections.observableArrayList();
                     for (int i = 0; i < client.getNumOfAllPlayers(); i++) {
-                        names.add(client.listenToClientNameForScoreBoard());
-                        scores.add(client.listenToClientScoreForScoreBoard());
+                        String name = client.listenToClientNameForScoreBoard();
+                        int score = client.listenToClientScoreForScoreBoard();
+
+                        System.out.println("*** final scores i:" + i + ", score:" + score);
+                        Client client = new Client(name, score);
+
+                        clientsObservableList.add(client);
                     }
+                    scoreBoardListView.setItems(clientsObservableList);
+                    scoreBoardListView.setCellFactory(param -> new ClientCellController());
+
+                    //add needs
 
 //                    resultTable = new MFXLegacyTableView<>();
 //                    TableColumn nameColumn = new TableColumn("Name");
@@ -274,6 +300,8 @@ public class GameScreenController {
 
         System.out.println("-----(before)reactionRadioButtons.size() when removing: " + reactionRadioButtons.size());
         System.out.println("-----(before)reactionPane.size() when removing: " + reactionPane.getChildren().size());
+
+        //remove previous round reaction radioButtons
         while (reactionRadioButtons.size()!=0) {
             Platform.runLater(()->{
                 reactionPane.getChildren().remove(0);
@@ -352,7 +380,7 @@ public class GameScreenController {
             });
         }
 
-        showTime(7 * othersAnswers.size() + 10 /*add needs (just delete this)*/);
+        showTime(7 * othersAnswers.size()/* + 10*/ /*add needs (just delete this)*/);
 
 
         ArrayList<String> reactions = new ArrayList<>();

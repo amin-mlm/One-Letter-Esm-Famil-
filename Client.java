@@ -21,12 +21,19 @@ public class Client {
     private Scanner scanner;
     private PrintWriter printWriter;
 
+    private int finalScore;
+
     private GameScreenController gameScreenController;
 
 
 
     public Client(String name) {
         this.name = name;
+    }
+
+    public Client(String name, int finalScore) {
+        this.name = name;
+        this.finalScore = finalScore;
     }
 
     public void joinToServer(int gameId) {
@@ -139,8 +146,9 @@ public class Client {
     }
 
 
-
-
+    public String getName() {
+        return name;
+    }
 
     public ArrayList<String> getFields() {
         return fields;
@@ -170,11 +178,27 @@ public class Client {
         return numOfAllPlayers;
     }
 
+    public int getFinalScore() {
+        return finalScore;
+    }
+
+    public void setFinalScore(int finalScore) {
+        this.finalScore = finalScore;
+    }
+
     public void setGameScreenController(GameScreenController gameScreenController) {
         this.gameScreenController = gameScreenController;
     }
 
     public int listenToRoundScore() {
+        return Integer.parseInt(scanner.nextLine());
+    }
+
+    public String listenToClientNameForScoreBoard() {
+        return scanner.nextLine();
+    }
+
+    public int listenToClientScoreForScoreBoard() {
         return Integer.parseInt(scanner.nextLine());
     }
 }
