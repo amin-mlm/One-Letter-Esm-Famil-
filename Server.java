@@ -198,7 +198,7 @@ public class Server {
                 }
             }).start();
             try {
-                Thread.sleep(20);
+                Thread.sleep(70); //was 20
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

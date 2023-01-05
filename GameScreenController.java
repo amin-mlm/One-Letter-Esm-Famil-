@@ -9,11 +9,8 @@ import io.github.palexdev.materialfx.controls.MFXTextField;
 import io.github.palexdev.materialfx.controls.legacy.MFXLegacyTableView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
@@ -80,9 +77,9 @@ public class GameScreenController {
     @FXML
     void initialize() {
 
-        if(thisRound==1){
-            addTextFieldsToPane();
-        }
+
+        prepareFieldPane();
+
 
         if (Integer.parseInt(plan.charAt(thisRound - 1) + "") == 1) {   //it can be 0 or 1       because thisRound starts from 1
             System.out.println("TURN ME");
@@ -149,15 +146,17 @@ public class GameScreenController {
             String message = client.listenToSendAnswerMessage();
             if (message.equals("Send Your Answers")) {
                 Platform.runLater(() -> {
+                    finishButton.setVisible(false);
+                    finishButton.setDisable(true);
                     for (int i = 0; i < textFields.size(); i++) {
                         textFields.get(i).setDisable(true);
                     }
                 });
 
                 //sleep here, instead of in server
-                //let server start to listen to all clients(212 server)
+                //let server start to listen to all clients(222 server)
                 try {
-                    Thread.sleep(200); //fewer? how many?
+                    Thread.sleep(200); //fewer? how many? // can + 1000 for seeing disability of TextFs?
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -165,7 +164,7 @@ public class GameScreenController {
                 for (int i = 0; i < fieldsString.size(); i++) {
                     System.out.println("will sleep for 10 * " + indexBetweenAllPlayers);
                     try {
-                        Thread.sleep(10 * indexBetweenAllPlayers);
+                        Thread.sleep((long)10 * indexBetweenAllPlayers);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -191,13 +190,7 @@ public class GameScreenController {
 
                 if(++thisRound<=rounds){
 
-                    int thisRoundScore = client.listenToRoundScore();
-                    Platform.runLater(()->{
-                        stateLabel.setText("You Got  " + thisRoundScore + "  In This Round !" +
-                                "\nWaite For The Next Round");
-                    });
-
-
+                    showNextRoundMessage();
                     nextRound();
 
                 }/*else{
@@ -251,6 +244,38 @@ public class GameScreenController {
         }
     }
 
+    private void showNextRoundMessage() {
+        int thisRoundScore = client.listenToRoundScore();
+        stateLabel.setVisible(true);
+        stateLabel.setDisable(false);
+
+
+        Platform.runLater(()->{
+            alphabetLabel.setText("Go With ' " + alphabet + " '");
+            stateLabel.setText("You Got  " + thisRoundScore + "  In This Round !" +
+                    "\nWaite For The Next Round");
+        });
+        fieldPane.setVisible(false);
+        fieldPane.setDisable(true);
+
+
+        for (int i = 0; i < textFields.size(); i++) {
+            textFields.get(i).setText("");
+        }
+
+        stateLabel.setVisible(false);
+        stateLabel.setDisable(true);
+
+        showTime(10);
+
+    }
+    private void nextRound() {
+
+        initialize();
+
+    }
+
+
     private void makeTextFieldsEnable() {
         for (int i = 0; i < textFields.size(); i++) {
             textFields.get(i).setDisable(false);
@@ -258,23 +283,24 @@ public class GameScreenController {
     }
 
     private int sendReactionAndGetPoint(ArrayList<String> othersAnswers, String category) {
-        finishButton.setVisible(false);
-        finishButton.setDisable(true);
-
         fieldPane.setVisible(false);
         fieldPane.setDisable(true);
 
         reactionPane.setVisible(true);
         reactionPane.setDisable(false);
 
+//        stateLabel.setVisible(true);
+//        stateLabel.setDisable(false);
+
         Platform.runLater(()->{
-            alphabetLabel.setText("Do You Consider These Answers To Be As A \"" + category + "\"" + " ?" +
+            alphabetLabel.setText("Do You Consider These Answers To Be As A \"" + category + "\"" + " ?(Must Starts With " + alphabet + " )" +
                 "\n(If None Is Chosen, \"Yes\" Will Be Automatically Ticked)");
         });
 
 
         ArrayList<ToggleGroup> toggleGroups = new ArrayList<>();
         ArrayList<RadioButton> radioButtonsYes = new ArrayList<>();
+        ArrayList<RadioButton> radioButtonsNo = new ArrayList<>();
         for (int i = 0; i < othersAnswers.size(); i++) {
             VBox vBox = new VBox();
 
@@ -283,6 +309,7 @@ public class GameScreenController {
             MFXRadioButton radioButtonYes = new MFXRadioButton("Yes");
             radioButtonsYes.add(radioButtonYes);
             MFXRadioButton radioButtonNo = new MFXRadioButton("No");
+            radioButtonsNo.add(radioButtonNo);
 
             radioButtonYes.setToggleGroup(toggle);
             radioButtonNo.setToggleGroup(toggle);
@@ -296,18 +323,23 @@ public class GameScreenController {
             });
         }
 
-         Thread thread = new Thread(()->{ //can without thread?
-            showTime(7 * othersAnswers.size() + 10 /*add needs (just delete this)*/);
-        });
-        thread.start();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        Thread thread = new Thread(()->{ //can without thread?
+//            showTime(7 * othersAnswers.size() + 10 /*add needs (just delete this)*/);
+//        });
+//        thread.start();
+//        try {
+//            thread.join();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        showTime(7 * othersAnswers.size() + 10 /*add needs (just delete this)*/);
+
 
         ArrayList<String> reactions = new ArrayList<>();
         for (index = 0; index < toggleGroups.size(); index++) {
+            radioButtonsNo.get(index).setDisable(true);
+            radioButtonsYes.get(index).setDisable(true);
+
             if(toggleGroups.get(index).getSelectedToggle()==null){
                 Platform.runLater(()->{
                     toggleGroups.get(index).selectToggle(radioButtonsYes.get(index));
@@ -325,8 +357,11 @@ public class GameScreenController {
             }
         }
 
-        finishButton.setVisible(true);
-        finishButton.setDisable(false);
+        try {
+            Thread.sleep(1000); //"Yes" automatically checked is visible on screen
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         fieldPane.setVisible(true);
         fieldPane.setDisable(false);
@@ -334,7 +369,8 @@ public class GameScreenController {
         reactionPane.setVisible(false);
         reactionPane.setDisable(true);
 
-
+//        stateLabel.setVisible(false);
+//        stateLabel.setDisable(true);
 
         return client.sendReactionsAndGetPoint(reactions);
 
@@ -342,26 +378,15 @@ public class GameScreenController {
 
 
     private void listenForAlphabet() {
-        alphabet = client.listenForAlphabet();
+        alphabet = Character.toUpperCase(client.listenForAlphabet()) ;
+
         Platform.runLater(() -> {
-            alphabetLabel.setText("Go With '" + Character.toUpperCase(alphabet) + "'");
+            alphabetLabel.setText("Go With ' " +alphabet + " '");
         });
     }
 
 
-    private void nextRound() {
-        fieldPane.setVisible(false);
-        showTime(10);
-        stateLabel.setVisible(false);
-        fieldPane.setVisible(true);
-        for (int i = 0; i < textFields.size(); i++) {
-            textFields.get(i).setText("");
-        }
 
-        initialize();
-
-
-    }
 
 
     private void showTime(int time) {
@@ -384,6 +409,8 @@ public class GameScreenController {
             secondTime = (long) (System.nanoTime() / Math.pow(10, 9));
         } while (secondTime - firstTime <= time);
 
+        timeLabel.setVisible(false);
+        timeLabel.setDisable(true);
     }
 
     public void setClient(Client client) {
@@ -401,22 +428,21 @@ public class GameScreenController {
         plan = client.getPlan();
     }
 
-    private void addTextFieldsToPane() {
+    private void prepareFieldPane() {
+        fieldPane.setVisible(true);
+        fieldPane.setDisable(false);
 
-        fieldPane.setOrientation(Orientation.HORIZONTAL);
-        fieldPane.setAlignment(Pos.CENTER);
-        fieldPane.setHgap(10);
-        fieldPane.setVgap(10);
+        if(thisRound==1){
+            for (String s : fieldsString) {
+                MFXTextField textField = new MFXTextField();
+                textField.setDisable(true);
+                textField.setFloatingText(s);
+                textField.setPrefHeight(60);
+                textField.setPrefWidth(120);
 
-        for (String s : fieldsString) {
-            MFXTextField textField = new MFXTextField();
-            textField.setDisable(true);
-            textField.setFloatingText(s);
-            textField.setPrefHeight(60);
-            textField.setPrefWidth(120);
-
-            textFields.add(textField);
-            fieldPane.getChildren().add(textField);
+                textFields.add(textField);
+                fieldPane.getChildren().add(textField);
+            }
         }
 
     }
