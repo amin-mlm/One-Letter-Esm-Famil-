@@ -20,5 +20,7 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch();
+//        DatabaseHandler databaseHandler = new DatabaseHandler();
+//        databaseHandler.removeServer(5);
     }
 }

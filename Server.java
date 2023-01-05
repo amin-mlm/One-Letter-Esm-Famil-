@@ -13,6 +13,8 @@ public class Server {
     private String gameName;
     private String password;
 
+    private int rate = 60;
+
     private int numFields;
     private ArrayList<String> fields;
     private String gameMode;
@@ -26,6 +28,7 @@ public class Server {
     boolean isGettingClientEnough = false;
     boolean didClientsSendAnswers = false;
 
+    int numPlayers=0;
 
     private ArrayList<Socket> sockets = new ArrayList<>();
     private ArrayList<Scanner> scanners = new ArrayList<>();
@@ -78,12 +81,14 @@ public class Server {
             scanners.add(scanner);
             printWriters.add(printwriter);
 
-            exchangeInfo(scanner, printwriter);
+            numPlayers++;
+
+            exchangeInfo(scanner, printwriter, numPlayers - 1);
 
         }
     }
 
-    private void exchangeInfo(Scanner scanner, PrintWriter printWriter) {
+    private void exchangeInfo(Scanner scanner, PrintWriter printWriter, int indexBetweenAllPlayers) {
 
         String name = scanner.nextLine();
         clientsName.add(name);
@@ -141,6 +146,9 @@ public class Server {
                     clientPlan += "0";
             }
             printWriters.get(i).println(clientPlan);
+            printWriters.get(i).println(numPlayers+"");
+            printWriters.get(i).println(i+"");
+
         }
 
 
@@ -168,8 +176,14 @@ public class Server {
                 System.out.println("message in server form client no." + relatedIndex + ", " + message);
                 if (message.equals("I Finish This Round")) {
                     new Thread(()->{
+                        System.out.println("relatedIndex of finisher: " + relatedIndex);
                         scanners.get(relatedIndex).nextLine();
                     }).start();
+                    try {
+                        Thread.sleep(500); //was 20
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     //nothing
                     CollectAndCheckAnswers(relatedIndex);
                 } else if (message.equals("I Will Send The Answer Now")) {
@@ -185,46 +199,166 @@ public class Server {
     }
 
     private synchronized void CollectAndCheckAnswers(int finisherIndex) { //index in 3 arrayLists(sockets, scanners, printWriters)
-        if (!didClientsSendAnswers) {
-            didClientsSendAnswers = true;
+        new Thread(() -> {
+            //get 1 field answer from all clients and
+            // send back the points they are given for this
+            // field and then go to next field and so on
+            for (int i = 0; i < numFields; i++) {
 
-            new Thread(() -> {
-                //get 1 field answer from all clients and
-                // send back the points they are given for this
-                // field and then go for next field and so on
-                for (int i = 0; i < numFields; i++) {
-                    ArrayList<String> answers = new ArrayList<>();
-                    ArrayList<Integer> points = new ArrayList<>();
+                System.out.println("\nfield: " + (i + 1) );
+                ArrayList<String> answers = new ArrayList<>();
+                ArrayList<String> points = new ArrayList<>();
 
-                    for (index = 0; index < scanners.size(); index++) {
-                        new Thread(() -> {
-                            String answer = scanners.get(index).nextLine();
-                            answers.add(answer);
-                        }).start();
+                for (index = 0; index < scanners.size(); index++) {
+                    new Thread(() -> {
+                        String answer = scanners.get(index).nextLine();
+                        answers.add(answer);
+                    }).start();
 
-                        try {
-                            Thread.sleep(200); //can be 20? yes 99%
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+                    try {
+                        Thread.sleep(1); //can be 1? yes 99%
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-
-                    points = calculatePoints(answers, fields.get(i));
-
-                    for (int j = 0; j < printWriters.size(); j++) {
-                        printWriters.get(j).println(points.get(j) + "");
-                    }
-
-
                 }
+                while (answers.size() != scanners.size()) {
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                System.out.println("server, checking answers: " + answers);
+                points = calculatePoints(answers, fields.get(i));
+
+                for (int j = 0; j < printWriters.size(); j++) {
+                    printWriters.get(j).println(points.get(j));
+                }
+
+
+                try {
+                    Thread.sleep(14000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+
+            if(++thisRound<=rounds){
+
+            }
+
+
+
+        }).start();
+
+        for (int j = 0; j < printWriters.size(); j++)
+            printWriters.get(j).println("Send Your Answers");
+
+
+    }
+
+
+    private ArrayList<String> calculatePoints(ArrayList<String> answers, String category) {
+        ArrayList<ArrayList<String>> allReactions = new ArrayList<>();
+        for (index = 0; index < numPlayers; index++) {
+            ArrayList<String> reactionsOfOnePlayer = new ArrayList<>();
+            for (int i = 0; i < numPlayers; i++) {
+                if(index==i)
+                    continue;
+                System.out.println("send answer: " + answers.get(i) + " to client no." + index);
+                printWriters.get(index).println(answers.get(i));
+            }
+            new Thread(()->{
+                int relatedIndex = index;
+                System.out.println("server 260, relatedIndex : " + relatedIndex);
+
+                for (int i = 0; i < numPlayers; i++) {
+                    if(i==relatedIndex){
+                        reactionsOfOnePlayer.add("Positive");
+                        continue;
+                    }
+                    System.out.println("server, listening ... for reaction of player "+ relatedIndex);
+                    String reaction = scanners.get(relatedIndex).nextLine();
+                    System.out.println("reaction of player " + relatedIndex + "to player " + i + " is: " + reaction);
+                    reactionsOfOnePlayer.add(reaction);
+                }
+                allReactions.add(reactionsOfOnePlayer);
             }).start();
 
-            for (int j = 0; j < printWriters.size(); j++)
-                printWriters.get(j).println("Send Your Answers");
+            try {
+                Thread.sleep(50); //important
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
         }
 
+        while (allReactions.size()!=numPlayers){
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("all reactions: " + allReactions);
+        ArrayList<String> filteredAnswers = new ArrayList<>();
+        for (int i = 0; i < numPlayers; i++) {
+            int positiveReactions = 0;
+            for (int j = 0; j < numPlayers; j++) {
+                if(i!=j && allReactions.get(j).get(i).equals("Positive")){
+                    positiveReactions++;
+                }
+            }
+            System.out.println("pos. reactions to i " + i + " is: " + positiveReactions);
+            if(((double)positiveReactions / (numPlayers -1)) >= ((double)rate / 100)){
+                filteredAnswers.add(answers.get(i));
+            }else{
+                filteredAnswers.add("");
+            }
+        }
+
+        System.out.println("SOO filteredAnswers " + filteredAnswers);
+        return checkSimilarities(filteredAnswers);
+
+
+
+//        int n = answers.size();
+//        ArrayList<Integer> points = new ArrayList<>();
+//        for (int i = 0; i < n; i++) {
+//            for (int j = 0; j < n; j++) {
+//                if(i!=j && answers.get(i).equals(answers.get(j))){
+//                    points.add(5);
+//                    break;
+//                }
+//                if(j==n-1)
+//                    points.add(10);
+//            }
+//        }
+//
+//        return points;
     }
+
+    private ArrayList<String> checkSimilarities(ArrayList<String> answers) {
+        ArrayList<String> points = new ArrayList<>();
+        for (int i = 0; i < numPlayers; i++) {
+            if(answers.get(i).equals(""))
+                points.add(0+"");
+            else
+                for (int j = 0; j < numPlayers; j++) {
+                    if(i!=j && answers.get(i).equals(answers.get(j))){
+                        points.add(5+"");
+                        break;
+                    }
+                    else if(j==numPlayers-1)
+                        points.add(10+"");
+                }
+        }
+        return points;
+    }
+
 
     private void determineAlphabet() {
         //index of player in scanners arraylist who has to determine the alphabet
@@ -254,24 +388,6 @@ public class Server {
             printWriters.get(i).println(alphabetChar + "");
         }
     }
-
-    private ArrayList<Integer> calculatePoints(ArrayList<String> answers, String category) {
-        int n = answers.size();
-        ArrayList<Integer> points = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if(i!=j && answers.get(i).equals(answers.get(j))){
-                    points.add(5);
-                    break;
-                }
-                if(j==n-1)
-                    points.add(10);
-            }
-        }
-
-        return points;
-    }
-
 
     private void sendNotif() {
         for (PrintWriter p : printWriters) {

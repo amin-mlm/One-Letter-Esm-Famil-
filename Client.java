@@ -12,7 +12,10 @@ public class Client {
     private String gameMode;
     private int rounds;
     private int time;
+    private int indexBetweenAllPlayers;
     private String plan;
+
+    private int numOfAllPlayers;
 
     private Socket socket;
     private Scanner scanner;
@@ -65,6 +68,8 @@ public class Client {
     public void waiteForStart() {
         System.out.println("client listening for plan...");
         plan = scanner.nextLine();
+        numOfAllPlayers = Integer.parseInt(scanner.nextLine());
+        indexBetweenAllPlayers = Integer.parseInt(scanner.nextLine());
         System.out.println(plan);
         System.out.println("client listening for message...");
         String message = scanner.nextLine();
@@ -108,6 +113,10 @@ public class Client {
         return time;
     }
 
+    public int getIndexBetweenAllPlayers() {
+        return indexBetweenAllPlayers;
+    }
+
     public String getPlan() {
         return plan;
     }
@@ -135,8 +144,23 @@ public class Client {
         printWriter.println("I Finish This Round");
     }
 
-    public int sendAnswerAndGetPoint(String answer) {
+    public ArrayList<String> sendAnswerAndGetOthersAnswers(String answer) {
         printWriter.println(answer);
+        ArrayList<String> othersAnswers = new ArrayList<>();
+        for (int i = 0; i < numOfAllPlayers - 1; i++) {
+            String otherAnswer = scanner.nextLine();
+            System.out.println("gathered answer " + otherAnswer + " where i is " + i + " and numPL is " + numOfAllPlayers);
+            othersAnswers.add(otherAnswer);
+        }
+        System.out.println(othersAnswers + " returned from client to gameScreen");
+        return othersAnswers;
+    }
+
+
+    public int sendReactionsAndGetPoint(ArrayList<String> reactions) {
+        for (int i = 0; i < reactions.size(); i++) {
+            printWriter.println(reactions.get(i));
+        }
         return Integer.parseInt(scanner.nextLine());
     }
 }
