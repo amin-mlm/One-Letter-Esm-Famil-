@@ -1,7 +1,5 @@
 package com.example.newesmfamil2;
 
-import javafx.application.Platform;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -101,6 +99,33 @@ public class Server {
     public void startGame() {
         System.out.println("in server, playernames");
         for(String s :clientsName) System.out.println(s);
+
+        //bring host from last to first of arrayLists
+        Socket lastSocket = sockets.get(sockets.size()-1);
+        sockets.remove(sockets.size()-1);
+        sockets.add(0, lastSocket);
+
+        Scanner lastScanner = scanners.get(scanners.size()-1);
+        scanners.remove(scanners.size()-1);
+        scanners.add(0, lastScanner);
+
+        PrintWriter lastPrintWriter = printWriters.get(printWriters.size()-1);
+        printWriters.remove(printWriters.size()-1);
+        printWriters.add(0, lastPrintWriter);
+
+
+        //set and send plan for specifying alphabets via clients
+        int numPlayers = sockets.size();
+        for(int i=0; i<numPlayers; i++){
+            String plan = "";
+            for(int j=0; j<rounds; j++){
+                if(j%numPlayers==i)
+                    plan += "1";
+                else
+                    plan += "0";
+            }
+            printWriters.get(i).println(plan);
+        }
 
 
         sendNotif();

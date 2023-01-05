@@ -14,6 +14,7 @@ public class Client {
     private String gameMode;
     private int rounds;
     private int time;
+    private String plan;
 
     private Socket socket;
     private Scanner scanner;
@@ -56,10 +57,14 @@ public class Client {
         rounds = scanner.nextInt();
         time = scanner.nextInt();
         scanner.nextLine();
+
     }
 
     public void waiteForStart() {
-        System.out.println("client listening...");
+        System.out.println("client listening for plan...");
+        plan = scanner.nextLine();
+        System.out.println(plan);
+        System.out.println("client listening for message...");
         String message = scanner.nextLine();
         if(message.equals("go to game")){
             System.out.println("go to game heard YESSSSSSSSSSSSSS");
@@ -92,6 +97,10 @@ public class Client {
 
     public int getTime() {
         return time;
+    }
+
+    public String getPlan() {
+        return plan;
     }
 }
 

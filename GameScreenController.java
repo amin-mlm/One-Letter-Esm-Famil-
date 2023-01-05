@@ -42,17 +42,11 @@ public class GameScreenController {
 
     private int time;
 
+    private String plan;
+
+    private int thisRound = 0;
+
     private long secondTime;
-
-
-
-    @FXML
-    private MFXTextField pkField;
-
-    @FXML
-    private MFXButton pressBtn;
-
-
 
 
 
@@ -61,79 +55,57 @@ public class GameScreenController {
         fieldPane.setOrientation(Orientation.HORIZONTAL);
         fieldPane.setAlignment(Pos.CENTER);
         fieldPane.setHgap(10);
-
-        timeLabel.setVisible(true);
-        timeLabel.setDisable(false);
-
-        new Thread(()->{
-            showTime();
-
-        }).start();
-
-//        for(String s : fieldsString){
-//            MFXTextField textField = new MFXTextField();
-//            textField.setFloatingText(s);
-//            textField.setPrefHeight(60);
-//            textField.setPrefWidth(120);
-//
-//            textFields.add(textField);
-//            fieldPane.getChildren().add(textField);
-//        }
+        fieldPane.setVgap(10);
 
 
-        /*if(gameMode.equals("Game Is Finished When The Time Is Over")){
+        for(String s : fieldsString){
+            MFXTextField textField = new MFXTextField();
+            textField.setFloatingText(s);
+            textField.setPrefHeight(60);
+            textField.setPrefWidth(120);
+
+            textFields.add(textField);
+            fieldPane.getChildren().add(textField);
+        }
+
+
+        if(gameMode.equals("Game Is Finished When The Time Is Over")){
             System.out.println("game is timeyy");
             timeLabel.setVisible(true);
             timeLabel.setDisable(false);
             new Thread( ()->{
-                    showTime();
-
+                showTime();
             }).start();
-        }*//*else{
-            finishButton.setOnAction(actionEvent -> {
-                System.out.println(fields.get(1).getText());
-            });
-        }*/
+        }else{
+            finishButton.setVisible(true);
+            finishButton.setDisable(false);
 
-        System.out.println("continue after thread");
+        }
+    }
 
-//        pressBtn.setOnAction(actionEvent -> {
-//            System.out.println(textFields.get(1).getText());
-//        });
+    private void nextRound(){
 
     }
+
 
     private void showTime(){
+        long firstTime = (long) (System.nanoTime() / Math.pow(10, 9));
 
-            int wholeTimeInSecond = 5;
+        secondTime = firstTime;
+        do {
+            Platform.runLater(()->{
+                timeLabel.setText((time + firstTime - secondTime) / 60 + ":" + (time + firstTime - secondTime) % 60);
+            });
 
-            long firstTime = (long) (System.nanoTime() / Math.pow(10, 9));
-            System.out.println("first time " + firstTime);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            secondTime = (long) (System.nanoTime() / Math.pow(10, 9));
+        } while (secondTime - firstTime <= time);
 
-            secondTime = firstTime;
-            do {
-                System.out.println("do show time started");
-
-                Platform.runLater(()->{
-                    timeLabel.setText((wholeTimeInSecond + firstTime - secondTime) / 60 + ":" + (wholeTimeInSecond + firstTime - secondTime) % 60);
-                });
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                secondTime = (long) (System.nanoTime() / Math.pow(10, 9));
-                System.out.println("second time " + secondTime);
-
-
-
-                System.out.println();
-            } while (secondTime - firstTime <= wholeTimeInSecond);
-            System.out.println("show time finish");
     }
-
 
     public void setClient(Client client) {
         this.client = client;
@@ -145,6 +117,7 @@ public class GameScreenController {
         rounds = client.getRounds();
         gameMode = client.getGameMode();
         time = client.getTime();
+        plan = client.getPlan();
 
     }
 }
