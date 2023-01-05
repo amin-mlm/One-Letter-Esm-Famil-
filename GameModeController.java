@@ -1,5 +1,7 @@
 package com.example.newesmfamil2;
 
+import com.example.newesmfamil2.animaition.Fade;
+import com.example.newesmfamil2.animaition.Shaker;
 import io.github.palexdev.materialfx.controls.MFXButton;
 
 import java.io.IOException;
@@ -7,11 +9,19 @@ import java.io.IOException;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class GameModeController {
+
+    @FXML
+    private Label labelLetter;
+
+    @FXML
+    private Label labelOne;
 
     @FXML
     private MFXButton createButton;
@@ -44,6 +54,10 @@ public class GameModeController {
 //                BackgroundSize.DEFAULT);
 //        joinButton.setBackground(new Background(myBI0));
 
+
+//        new Fade(labelOne).fadeIn();
+//        new Fade(labelLetter).fadeIn();
+
         createButton.setOnAction(actionEvent -> {
             fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/createGame.fxml"));
             try {
@@ -64,17 +78,32 @@ public class GameModeController {
             }
         });
 
-        helpButton.setOnAction(actionEvent -> {
-            String help = "Introduction:\n   'One Letter' is a mental game that you can challenge your mind against " +
-                    "other players.\nDescription:\n   By joining the game, each round one player is prompted to insert " +
-                    "an alphabet.\n   By determining alphabet, the game is started and all players should fill their answers till the game is finished\n" +
-                    "   Answers will be sent to other players to check them if the answer is sutable for the field  ";
-        });
+//        Alert alert = new Alert(Alert.AlertType.ERROR);
+//        alert.setContentText("ladjkfj");
+//        alert.setHeaderText("ERROR");
+//        alert.show();
 
         exitButton.setOnAction(actionEvent -> {
             Platform.exit();
         });
 
+
+        new Thread(()->{
+            try {
+                Thread.sleep(1000); //animation
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            new Shaker(labelOne).transit();
+
+            try {
+                Thread.sleep(1000); //animation
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            new Shaker(labelLetter).transit();
+        }).start();
 
     }
 

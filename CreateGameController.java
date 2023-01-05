@@ -84,9 +84,6 @@ public class CreateGameController {
     private MFXSlider timeSlider;
 
     @FXML
-    private MFXButton singleGameButton;
-
-    @FXML
     private MFXButton createGameButton;
 
     @FXML
