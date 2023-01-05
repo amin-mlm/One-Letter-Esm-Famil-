@@ -1,6 +1,7 @@
 package com.example.newesmfamil2;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class TestThread {
     static int i;
@@ -31,36 +32,43 @@ public class TestThread {
 ////        aa.add(1, 5+temp);
 //        aa.set(1, 16);
 //        System.out.println(aa);
-        ArrayList<Integer> aa = new ArrayList<>();
-        aa.add(11);
-        aa.add(10);
-        aa.add(12);
-        aa.add(13);
-        aa.add(14);
-        aa.add(12);
-        aa.add(15);
-        aa.add(9);
-        aa.add(10);
-        aa.add(8);
-        System.out.println(aa);
 
-outer:  for (int i = 0; i < aa.size(); i++) {
-            boolean should = false;
-            for (int j = 0; j < aa.size() - 1; j++) {
-                if(aa.get(j) > aa.get(j+1)){
-                    int tempScore = aa.get(j);
-                    aa.set(j, aa.get(j+1));
-                    aa.set(j+1, tempScore);
-                    should = true;
-                }
-                else if( j==aa.size() - 2 && !should){
-                    break outer;
-                }
-            }
+//        ArrayList<Integer> aa = new ArrayList<>();
+//        aa.add(11);
+//        aa.add(10);
+//        aa.add(12);
+//        aa.add(13);
+//        aa.add(14);
+//        aa.add(12);
+//        aa.add(15);
+//        aa.add(9);
+//        aa.add(10);
+//        aa.add(8);
+//        System.out.println(aa);
+//
+//outer:  for (int i = 0; i < aa.size(); i++) {
+//            boolean should = false;
+//            for (int j = 0; j < aa.size() - 1; j++) {
+//                if(aa.get(j) > aa.get(j+1)){
+//                    int tempScore = aa.get(j);
+//                    aa.set(j, aa.get(j+1));
+//                    aa.set(j+1, tempScore);
+//                    should = true;
+//                }
+//                else if( j==aa.size() - 2 && !should){
+//                    break outer;
+//                }
+//            }
+//        }
+//        System.out.println(aa);
+
+        var scanner = new Scanner("amin mv owi   ");
+        String name="";
+        while (scanner.hasNext()) {
+            name += scanner.next() + " ";
         }
-
-        System.out.println(aa);
-
+        String answer = name.substring(0, name.length()-1);
+        System.out.println(answer);
 
 //        while (aa.size()!=0){
 //            aa.remove(0);

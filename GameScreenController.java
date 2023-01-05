@@ -3,6 +3,8 @@ package com.example.newesmfamil2;
 import io.github.palexdev.materialfx.controls.MFXButton;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
 
 import io.github.palexdev.materialfx.controls.MFXRadioButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -159,7 +161,6 @@ public class GameScreenController {
             }
         }
 
-
         return 0;
     }
 
@@ -190,7 +191,9 @@ public class GameScreenController {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    ArrayList<String> othersAnswers = client.sendAnswerAndGetOthersAnswers(textFields.get(i).getText());
+
+                    String answer = removeSpaceFromAnswer(textFields.get(i).getText());
+                    ArrayList<String> othersAnswers = client.sendAnswerAndGetOthersAnswers(answer);
 
                     System.out.println("gameScreen, othersAnswer: " + othersAnswers);
 
@@ -214,9 +217,6 @@ public class GameScreenController {
                 }else{
                     prepareNextRound();
 
-                    fieldPane.setVisible(false);
-                    fieldPane.setDisable(true);
-
                     alphabetLabel.setVisible(false);
                     alphabetLabel.setDisable(true);
 
@@ -233,17 +233,15 @@ public class GameScreenController {
 
                         System.out.println("*** final scores i:" + i + ", score:" + finalScore);
                         int rank;
-                        if(i==0) rank = 1;
+                        if(i==0)
+                            rank = 1;
                         else{
                             if(finalScore==clientsObservableList.get(i-1).getFinalScore()){
                                 rank = lastRank;
                             }else
                                 rank = ++lastRank;
                         }
-//                        if(i>0 && finalScore==clientsObservableList.get(i-1).getFinalScore())
-//                            rank = i;
-//                        else
-//                            rank = i+1;
+
                         Client client = new Client(name, finalScore, rank);
 
                         clientsObservableList.add(client);
@@ -254,19 +252,8 @@ public class GameScreenController {
 
                     //add needs
 
-//                    resultTable = new MFXLegacyTableView<>();
-//                    TableColumn nameColumn = new TableColumn("Name");
-//                    TableColumn scoreColumn = new TableColumn("Score");
-//
-//                    resultTable.getColumns().add
-//
-//                    if(finalState==1){
-//                        stateLabel.setText("You Are The CHAMPION !!!" +
-//                                "You Got  " + sumScore + "  !");
-//                    }else if(finalState==2){
-//                        stateLabel.setText("You Got  \" + sumScore + \"  !" +
-//                                "You Are the 2'nd ");
-//                    }
+
+
                 }
 
 
@@ -295,6 +282,18 @@ public class GameScreenController {
         }
     }
 
+
+    private String removeSpaceFromAnswer(String primaryAnswer) {
+        if(primaryAnswer.equals("")) return primaryAnswer;
+
+        var scanner = new Scanner(primaryAnswer);
+        String answer = "";
+        while (scanner.hasNext()) {
+            answer += scanner.next() + " ";
+        }
+        return answer.substring(0, answer.length()-1); //remove last space
+    }
+
     private void prepareNextRound() {
         int thisRoundScore = client.listenToRoundScore();
         stateLabel.setVisible(true);
@@ -302,7 +301,7 @@ public class GameScreenController {
 
 
         Platform.runLater(()->{
-            alphabetLabel.setText(""); /*Go With ' " + alphabet + " '*/
+            alphabetLabel.setText("");
             stateLabel.setText("You Got  " + thisRoundScore + "  In This Round !" +
                     "\nWaite For The Next Round");
         });
@@ -359,9 +358,6 @@ public class GameScreenController {
         reactionPane.setVisible(true);
         reactionPane.setDisable(false);
 
-//        stateLabel.setVisible(true);
-//        stateLabel.setDisable(false);
-
         Platform.runLater(()->{
             alphabetLabel.setText("Do You Consider These Answers To Be As A \"" + category + "\"" + " ?(Must Starts With " + alphabet + " )" +
                 "\n(If None Is Chosen, \"Yes\" Will Be Automatically Ticked)");
@@ -371,7 +367,24 @@ public class GameScreenController {
         ArrayList<ToggleGroup> toggleGroups = new ArrayList<>();
         ArrayList<RadioButton> radioButtonsYes = new ArrayList<>();
         ArrayList<RadioButton> radioButtonsNo = new ArrayList<>();
+
+        int[] similarAnswers = new int[othersAnswers.size()]; //e.g. index i in othersAnswers is similar to similarAnswers[i] so we won't create radioButton for othersAnswers.get(i)
+        Arrays.fill(similarAnswers, -1);
+
         for (int i = 0; i < othersAnswers.size(); i++) {
+            int state = isAnswerSimilarToOthers(othersAnswers.get(i), i, othersAnswers);
+            if(othersAnswers.get(i).equals("") || !(othersAnswers.get(i).charAt(0)+"").equalsIgnoreCase(alphabet+"")){
+                System.out.println("++++++++++++++++ emptyIf i " + i);
+                continue;
+            }
+            else if(state!=-1){
+                similarAnswers[i] = state;
+                System.out.println("++++++++++++++++ similarIf i " + i);
+                continue;
+            }
+
+            System.out.println("++++++++++++++++ vbox i " + i);
+
             VBox vBox = new VBox();
 
             Label answer = new Label(othersAnswers.get(i));
@@ -384,7 +397,6 @@ public class GameScreenController {
             radioButtonYes.setToggleGroup(toggle);
             radioButtonNo.setToggleGroup(toggle);
             toggleGroups.add(toggle);
-
 
             vBox.getChildren().addAll(answer, radioButtonYes, radioButtonNo);
 
@@ -400,7 +412,22 @@ public class GameScreenController {
 
 
         ArrayList<String> reactions = new ArrayList<>();
-        for (index = 0; index < toggleGroups.size(); index++) {
+        index = 0;
+        for (int i=0; i < othersAnswers.size(); i++) {
+            if(othersAnswers.get(i).equals("") || !(othersAnswers.get(i).charAt(0)+"").equalsIgnoreCase(alphabet+"")) {
+                reactions.add("Negative");
+//                System.out.println("    for answer " + othersAnswers.get(i) + ", empty negative");
+                continue;
+            }else if(similarAnswers[i]!=-1){
+                reactions.add(reactions.get(similarAnswers[i]));
+//                System.out.println("    for answer " + othersAnswers.get(i) + ", similar ot i " + similarAnswers[i]);
+                continue;
+            }
+
+
+//            System.out.println("    for answer " + othersAnswers.get(i) + ", vbox");
+
+
             radioButtonsNo.get(index).setDisable(true);
             radioButtonsYes.get(index).setDisable(true);
 
@@ -419,6 +446,7 @@ public class GameScreenController {
             }else{
                 reactions.add("Negative");
             }
+            index++;
         }
 
         try {
@@ -433,9 +461,6 @@ public class GameScreenController {
         reactionPane.setVisible(false);
         reactionPane.setDisable(true);
 
-//        stateLabel.setVisible(false);
-//        stateLabel.setDisable(true);
-
         try {
             Thread.sleep(10 * indexBetweenAllPlayers);
         } catch (InterruptedException e) {
@@ -445,8 +470,22 @@ public class GameScreenController {
 
     }
 
+    private int isAnswerSimilarToOthers(String answer, int index, ArrayList<String> othersAnswers) {
+        for (int i = 0; i < othersAnswers.size(); i++) {
+            if(i==index)
+                break;
+            if(othersAnswers.get(i).equals(answer))
+                return i;
+        }
+        return -1;
+    }
+
 
     private void listenForAlphabet() {
+        Platform.runLater(()->{
+            alphabetLabel.setText("Let Game Alphabet Be Determined ..."); //add needs
+        });
+
         alphabet = Character.toUpperCase(client.listenForAlphabet()) ;
 
         Platform.runLater(() -> {

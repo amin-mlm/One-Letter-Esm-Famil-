@@ -317,6 +317,7 @@ outer:          for (int i = 0; i < clientsSumPoints.size(); i++) {
                         
                     }
                 }
+
                 //send final scores to all clients
                 for (int i = 0; i < numPlayers; i++) {
                     for (int j = 0; j < numPlayers; j++) {
