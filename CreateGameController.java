@@ -158,7 +158,7 @@ public class CreateGameController {
         //also, eventFilter can be implemented to consume event in some situations
         startGameButton.setOnAction(actionEvent -> {
             server.isGettingClientEnough = true;
-            Client client = new Client(gameNameField.getText());
+            Client client = new Client(hostNameField.getText());
 
             new Thread( ()->{
                 client.joinToServer(server.getPort());

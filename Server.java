@@ -118,16 +118,16 @@ public class Server {
         }
 
         //bring host from last to first of arrayLists
-        sockets.set(0,sockets.get(sockets.size() - 1));
+        sockets.add(0,sockets.get(sockets.size() - 1));
         sockets.remove(sockets.size()-1);
 
-        scanners.set(0,scanners.get(scanners.size() - 1));
+        scanners.add(0,scanners.get(scanners.size() - 1));
         scanners.remove(scanners.size()-1);
 
-        printWriters.set(0,printWriters.get(printWriters.size() - 1));
+        printWriters.add(0,printWriters.get(printWriters.size() - 1));
         printWriters.remove(printWriters.size()-1);
 
-        clientsName.set(0,clientsName.get(clientsName.size() - 1));
+        clientsName.add(0,clientsName.get(clientsName.size() - 1));
         clientsName.remove(clientsName.size()-1);
 
 //        Socket lastSocket = sockets.get(sockets.size() - 1);
@@ -292,9 +292,24 @@ public class Server {
                 nextRound();
             } else {
                 //sort clients name by final score
-                for (int i = 0; i < clientsSumPoints.size(); i++) {
-                    for (int j = 0; j < clientsSumPoints.size(); j++) {
-                        if(clientsSumPoints.get(i).)
+outer:          for (int i = 0; i < clientsSumPoints.size(); i++) {
+                    boolean shouldBreak = true;
+                    for (int j = 0; j < clientsSumPoints.size() - 1; j++) {
+                        if(clientsSumPoints.get(j) < clientsSumPoints.get(j+1)){
+                            int tempScore = clientsSumPoints.get(j);
+                            clientsSumPoints.set(j, clientsSumPoints.get(j+1));
+                            clientsSumPoints.set(j+1, tempScore);
+
+                            String tempName = clientsName.get(j);
+                            clientsName.set(j, clientsName.get(j+1));
+                            clientsName.set(j+1, tempName);
+
+                            shouldBreak = false;
+                        }
+                        else if( j==clientsSumPoints.size() - 2 && shouldBreak){
+                            break outer;
+                        }
+                        
                     }
                 }
                 //send final scores to all clients
@@ -302,7 +317,6 @@ public class Server {
                     for (int j = 0; j < numPlayers; j++) {
                         printWriters.get(i).println(clientsName.get(j));
                         printWriters.get(i).println(clientsSumPoints.get(j));
-
                     }
                 }
 
