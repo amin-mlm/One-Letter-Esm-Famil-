@@ -96,21 +96,6 @@ public class CreateGameController {
     private Label errorLabel;
 
     @FXML
-    private Label hostNameFieldError;
-
-    @FXML
-    private Label gameNameFieldError;
-
-    @FXML
-    private Label roundsFieldError;
-
-    @FXML
-    private Label gameModeError;
-
-    @FXML
-    private Label timeError;
-
-    @FXML
     private MFXLegacyTableView<Client> playerNameTableView = new MFXLegacyTableView<>();
 
     ArrayList<String> fields = new ArrayList<>();
@@ -145,7 +130,6 @@ public class CreateGameController {
             timeSlider.setDisable(true);
         });
 
-        //also, eventFilter can be implemented to consume event in some situations
         createGameButton.addEventFilter(ActionEvent.ACTION, actionEvent -> {
             fields.clear();
 
@@ -158,21 +142,10 @@ public class CreateGameController {
             gameNameField.setStyle("-fx-border-color: ");
 
 
-
             if(isGameCreated){
                 errorLabel.setText("Game Is Already Created");
                 new Fade(errorLabel).fadeIn();
-
                 new Shaker(createGameButton).shake();
-//
-//                new Thread(()->{
-//                    try {
-//                        Thread.sleep(4000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    new Fade(errorLabel).fadeOut();
-//                }).start();
 
                 actionEvent.consume();
             }
@@ -202,7 +175,6 @@ public class CreateGameController {
             }else
                 mode = ((RadioButton)gameModeToggle.getSelectedToggle()).getText();
 
-
             rounds = 0;
             try{
                 rounds = Integer.parseInt(roundsField.getText());
@@ -231,7 +203,6 @@ public class CreateGameController {
                 actionEvent.consume();
             }
 
-
             hostName = hostNameField.getText();
             if(hostName.equals("") || hostName.charAt(0)==' '){
                 errorLabel.setText("Invalid Name");
@@ -244,7 +215,6 @@ public class CreateGameController {
 
                 actionEvent.consume();
             }
-
 
             if (firstnameCheck.isSelected()) fields.add(firstnameCheck.getText());
             if (lastnameCheck.isSelected()) fields.add(lastnameCheck.getText());
@@ -304,12 +274,6 @@ public class CreateGameController {
 
         });
 
-
-
-
-
-        //enough button
-        //also, eventFilter can be implemented to consume event in some situations
         startGameButton.addEventFilter(ActionEvent.ACTION, actionEvent -> {
             if(!isGameCreated){
                 errorLabel.setText("Create The Game First");
@@ -317,6 +281,7 @@ public class CreateGameController {
                 new Shaker(startGameButton).shake();
 
                 actionEvent.consume();
+                return;
             }
             if(server.getNumPlayers()<1){
                 errorLabel.setText("No One Has Been Joined The Game Yet!");
@@ -330,7 +295,7 @@ public class CreateGameController {
         startGameButton.setOnAction(actionEvent -> {
             server.isAcceptingClientEnough = true;
 
-            //make a Client class for host as well
+            //make a Client object for host to be considered a player
             Client client = new Client(hostNameField.getText());
             new Thread( ()->{
                 client.joinToServer(server.getPort());

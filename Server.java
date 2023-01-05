@@ -301,28 +301,13 @@ public class Server {
                     clientsSumPoints.set(j, clientsSumPoints.get(j) + Integer.parseInt(points.get(j)));
                 }
 
-
-//                if (i == fields.size() - 1)
-//                    try {
-//                        Thread.sleep(16000); //1 + 15(see their points)
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                else
-//                    try {
-//                        Thread.sleep(14000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-
-
             }
 
-            //(15s) see their points +
+            //(10s) see their points +
             // (1s) server wants to send s.t after
             // sleep, so clients should be ready for it
             try {
-                Thread.sleep(16000);
+                Thread.sleep(11000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -375,8 +360,8 @@ public class Server {
         for (int i = 0; i < sockets.size(); i++) {
             try {
                 sockets.get(i).close();
-                printWriters.get(i).close();
-                scanners.get(i).close();
+//                printWriters.get(i).close();
+//                scanners.get(i).close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

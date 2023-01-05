@@ -18,6 +18,12 @@ public class GameModeController {
     private MFXButton joinButton;
 
     @FXML
+    private MFXButton helpButton;
+
+    @FXML
+    private MFXButton exitButton;
+
+    @FXML
     private AnchorPane rootPane;
 
     static FXMLLoader fxmlLoader;
@@ -55,6 +61,19 @@ public class GameModeController {
                 e.printStackTrace();
             }
         });
+
+        helpButton.setOnAction(actionEvent -> {
+            String help = "Introduction:\n   'One Letter' is a mental game that you can challenge your mind against " +
+                    "other players.\nDescription:\n   By joining the game, each round one player is prompted to insert " +
+                    "an alphabet.\n   By determining alphabet, the game is started and all players should fill their answers till the game is finished\n" +
+                    "   Answers will be sent to other players to check them if the answer is sutable for the field  ";
+        });
+
+        exitButton.setOnAction(actionEvent -> {
+            exitButton.getScene().getWindow().hide();
+        });
+
+
     }
 
 }

@@ -1,5 +1,7 @@
 package com.example.newesmfamil2;
 
+import javafx.stage.Stage;
+
 import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;

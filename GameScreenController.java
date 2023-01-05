@@ -1,6 +1,7 @@
 package com.example.newesmfamil2;
 
 import com.example.newesmfamil2.animaition.Shaker;
+import com.example.newesmfamil2.animaition.Waiting;
 import io.github.palexdev.materialfx.controls.MFXButton;
 
 import java.io.IOException;
@@ -22,8 +23,8 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 
 public class GameScreenController {
@@ -189,6 +190,7 @@ public class GameScreenController {
 
         Platform.runLater(()->{
             alphabetLabel.setText("Determine Game Alphabet Below");
+//            new Waiting(alphabetLabel).waiting();
         });
     }
 
@@ -207,11 +209,17 @@ public class GameScreenController {
             });
             new Shaker(alphabetField).shake();
 
-            return -1; //code for invalid char error
+            return -1; //code for invalid alphabet error
         }
         if (!((alphabetChar >= 65 && alphabetChar <= 90) || (alphabetChar >= 97 && alphabetChar <= 122))) {
-            // add needs
-            return -1; //code for invalid char error
+            alphabetField.setStyle("-fx-border-color: red");
+            Platform.runLater(()->{
+                alphabetField.setText("");
+                alphabetField.setPromptText("Between A to Z");
+            });
+            new Shaker(alphabetField).shake();
+
+            return -1; //code for invalid alphabet error
         } else {
             int result = client.sendAlphabet(alphabetString);
             if (result == 0) {
@@ -219,16 +227,21 @@ public class GameScreenController {
                 alphabetField.setVisible(false);
                 alphabetButton.setDisable(true);
                 alphabetButton.setVisible(false);
-                return 0; //code for all ok
+                return 0; //code for everything is ok
             } else if (result == -1) {
                 System.out.println("gameScreen: repeated alpha try again");
-                // add needs for being repeated alphabet
-                return -1; //code for invalid char error
+                alphabetField.setStyle("-fx-border-color: red");
+                Platform.runLater(()->{
+                    alphabetField.setText("");
+                    alphabetField.setPromptText("repeated alphabet");
+                });
+                new Shaker(alphabetField).shake();
+
+                return -1; //code for invalid alphabet error
             }else if(result == -2){ //host left game
                 return -1;
             }
         }
-
         return 0;
     }
 
@@ -256,6 +269,8 @@ public class GameScreenController {
 
                 for (int i = 0; i < textFields.size(); i++) {
                     System.out.println("will sleep for 10 * " + indexBetweenAllPlayers);
+
+                    //sleep to avoid sync data with other players
                     try {
                         Thread.sleep((long)10 * indexBetweenAllPlayers);
                     } catch (InterruptedException e) {
@@ -275,7 +290,6 @@ public class GameScreenController {
                     System.out.println("point for textField " + i + " = " + point);
 
                     if(point==-1){
-//                        hostLeftGame = true;
                         return;
                     }
 
@@ -284,9 +298,7 @@ public class GameScreenController {
                     String tempAnswer = textFields.get(i).getText();
                     textFields.get(i).setText(tempAnswer + ", " + point);
 
-                    showTime(15);
-
-                    // add needs
+                    showTime(10); //if this time changes, sleep in server before sending roundScore should be updated to (time + 1)
                 }
 
                 if (++thisRound <= rounds) {
@@ -342,12 +354,6 @@ public class GameScreenController {
 
 
 
-                    //add needs
-
-                    // next Game
-
-
-
                     newGameButton.setVisible(true);
                     newGameButton.setDisable(false);
 
@@ -375,7 +381,7 @@ public class GameScreenController {
                 client.sendFinishState();
 
 
-        } else if (gameMode.equals("Game Is Finished When A Player Finished")) {
+        } else if (gameMode.equals("Game Is Finished When A Player Finishes")) {
             System.out.println("game is stopyy");
             finishButton.setVisible(true);
             finishButton.setDisable(false);
@@ -614,16 +620,18 @@ public class GameScreenController {
 
     private int listenForAlphabet() {
         Platform.runLater(()->{
-            alphabetLabel.setText("Let Game Alphabet Be Determined ..."); //add needs
+            alphabetLabel.setText("Let Game Alphabet Be Determined"); //add needs
+//            new Waiting(alphabetLabel).waiting();
         });
 
         alphabet = Character.toUpperCase(client.listenForAlphabet());
+//        Waiting.setIsAnimationEnough(true);
         if(alphabet==' ') //host left the game
             return -1;
 
 
         Platform.runLater(() -> {
-            alphabetLabel.setText("Go With ' " +alphabet + " '");
+            alphabetLabel.setText("Go With ' " + alphabet + " '");
         });
 
         return 0;
@@ -648,7 +656,7 @@ public class GameScreenController {
                 e.printStackTrace();
             }
             secondTime = (long) (System.nanoTime() / Math.pow(10, 9));
-        } while (secondTime - firstTime <= time);
+        } while (secondTime - firstTime <= time && timeLabel.getScene().getWindow().isShowing());
 
         timeLabel.setVisible(false);
         timeLabel.setDisable(true);

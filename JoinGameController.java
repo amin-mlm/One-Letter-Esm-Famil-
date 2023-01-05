@@ -39,15 +39,12 @@ public class JoinGameController {
 
     private DatabaseHandler databaseHandler = new DatabaseHandler();
 
-    private int gamePort;
+    private int gamePort = -1;
 
     private String gameName;
 
     @FXML
     void initialize() {
-        gamePort =-1;
-
-//        serversObservableList.clear();
         ArrayList<Server> servers = databaseHandler.showServers();
         System.out.println("in JoinGameContro: " + servers.size());
         serversObservableList = FXCollections.observableArrayList();
@@ -104,6 +101,7 @@ public class JoinGameController {
         this.gameName = gameName;
 
         sayWelcome(gameName);
+        System.out.println("welcome");
 
         Client client = new Client(clientNameField.getText());
 
@@ -127,6 +125,7 @@ public class JoinGameController {
     }
 
     private void sayWelcome(String gameName){
+        gameStateLabel.setOpacity(1f);
         gameStateLabel.setText("Welcome To " + gameName + "'s Game" +
                 "\nwait for others to join...");
         //add needs
