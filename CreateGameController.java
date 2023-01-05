@@ -3,16 +3,17 @@ package com.example.newesmfamil2;
 import io.github.palexdev.materialfx.controls.*;
 
 import java.io.*;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
+
+import javax.swing.plaf.TableHeaderUI;
 
 public class CreateGameController {
 
@@ -159,7 +160,9 @@ public class CreateGameController {
 
             new Thread( ()->{
                 client.joinToServer(server.getPort());
-                client.waiteForStart();
+                Platform.runLater(()->{
+                    client.waiteForStart();
+                });
             }).start();
             try {
                 Thread.sleep(200);
@@ -167,21 +170,29 @@ public class CreateGameController {
                 e.printStackTrace();
             }
 
-            server.startGame();
+            new Thread( ()->{ //can be without thread? yes I think
+                server.startGame();
+            }).start();
 
         });
 
     }
 
 
-    public void gotoGameScreen(){
+    public void gotoGameScreen(Client client){
+
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
+        GameScreenController controller = new GameScreenController();
         try {
-            rootPane.getChildren().setAll((Node) fxmlLoader.load());
+            fxmlLoader.setController(controller);
+            controller.setClient(client);
+            Parent root = fxmlLoader.load();
+            rootPane.getChildren().setAll(root);
+    //            ((GameScreenController)fxmlLoader.getController()).setClient(client);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ((GameScreenController)(fxmlLoader.getController())).addFields(server.getFields());
+
 
     }
 

@@ -3,17 +3,18 @@ package com.example.newesmfamil2;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import io.github.palexdev.materialfx.controls.legacy.MFXLegacyListView;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.*;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
+
 
 public class JoinGameController {
 
@@ -70,14 +71,19 @@ public class JoinGameController {
         //add needs
     }
 
-    public void gotoGameScreen(){
+    public void gotoGameScreen(Client client){
+
         FXMLLoader fxmlLoader = new FXMLLoader(JoinGameController.class.getResource("/com/example/newesmfamil2/gameScreen.fxml"));
+        GameScreenController controller = new GameScreenController();
         try {
-            rootPane.getChildren().setAll((Node) fxmlLoader.load());
+            fxmlLoader.setController(controller);
+            controller.setClient(client);
+            Parent root = fxmlLoader.load();
+            rootPane.getChildren().setAll(root);
+//            ((GameScreenController)fxmlLoader.getController()).setClient(client);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
 

@@ -104,16 +104,16 @@ public class Server {
 
 
         sendNotif();
+//
+//        new Thread( ()->{
+//            Platform.runLater( ()->{
+//                ((CreateGameController)(GameModeController.fxmlLoader.getController())).gotoGameScreen(this);
+//            });
+//        }).start();
 
-        new Thread( ()->{
-            Platform.runLater( ()->{
-                ((CreateGameController)(GameModeController.fxmlLoader.getController())).gotoGameScreen();
-            });
-        }).start();
-
-        new Thread( ()->{
-//            checkAnswers();
-        }).start();
+//        new Thread( ()->{
+                                        //checkAnswers();
+//        }).start();
 
     }
 

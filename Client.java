@@ -64,17 +64,33 @@ public class Client {
         if(message.equals("go to game")){
             System.out.println("go to game heard YESSSSSSSSSSSSSS");
 
-            new Thread( ()->{
-                Platform.runLater( ()->{
+//            new Thread( ()->{
+//                Platform.runLater( ()->{
 //                    if (GameModeController.fxmlLoader.getLocation().toString().equals("/com/example/newesmfamil2/createGame.fxml"))
                     if((GameModeController.fxmlLoader.getController()) instanceof CreateGameController)
-                        ((CreateGameController)(GameModeController.fxmlLoader.getController())).gotoGameScreen();
+                        ((CreateGameController)GameModeController.fxmlLoader.getController()).gotoGameScreen(this);
                     else
-                        ((JoinGameController)(GameModeController.fxmlLoader.getController())).gotoGameScreen();
-                });
-            }).start();
+                        ((JoinGameController)GameModeController.fxmlLoader.getController()).gotoGameScreen(this);
+//                });
+//            }).start();
 
             // write s.t to play for game
         }
+    }
+
+    public ArrayList<String> getFields() {
+        return fields;
+    }
+
+    public String getGameMode() {
+        return gameMode;
+    }
+
+    public int getRounds() {
+        return rounds;
+    }
+
+    public int getTime() {
+        return time;
     }
 }

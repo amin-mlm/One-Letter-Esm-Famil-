@@ -4,7 +4,12 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+
+import io.github.palexdev.materialfx.controls.MFXTextField;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 
@@ -25,20 +30,106 @@ public class GameScreenController {
     @FXML
     private Label timeLabel;
 
-    private ArrayList<String> fields = new ArrayList<>();
+    private Client client;
+
+    private ArrayList<String> fieldsString = new ArrayList<>();
+
+    private ArrayList<MFXTextField> textFields = new ArrayList<>();
+
+    private int rounds;
+
+    private String gameMode;
+
+    private int time;
+
+
+
+
+    @FXML
+    private MFXTextField pkField;
+
+    @FXML
+    private MFXButton pressBtn;
+
+
+
 
 
     @FXML
     void initialize() {
-        for(String s : fields){
-//            fieldPane.getChildren().add(s);
+        fieldPane.setOrientation(Orientation.HORIZONTAL);
+        fieldPane.setAlignment(Pos.CENTER);
+        fieldPane.setHgap(10);
+
+
+        for(String s : fieldsString){
+            MFXTextField textField = new MFXTextField();
+            textField.setFloatingText(s);
+            textField.setPrefHeight(60);
+            textField.setPrefWidth(120);
+
+            textFields.add(textField);
+            fieldPane.getChildren().add(textField);
         }
 
 
+        if(gameMode.equals("Game Is Finished When The Time Is Over")){
+            System.out.println("game is timeyy");
+            timeLabel.setVisible(true);
+            timeLabel.setDisable(false);
+            new Thread( ()->{
+                    showTime();
+
+            }).start();
+        }/*else{
+            finishButton.setOnAction(actionEvent -> {
+                System.out.println(fields.get(1).getText());
+            });
+        }*/
+
+        System.out.println("continue after thread");
+
+        pressBtn.setOnAction(actionEvent -> {
+            System.out.println(textFields.get(1).getText());
+        });
+
     }
 
-    public void addFields(ArrayList<String> fields){
-        this.fields = fields;
+    private void showTime(){
+
+        Platform.runLater(()->{
+            int wholeTimeInSecond = 5;
+
+            long firstTime = (long) (System.nanoTime() / Math.pow(10, 9));
+
+            long secondTime;
+            do {
+                System.out.println("do show time started");
+                secondTime = (long) (System.nanoTime() / Math.pow(10, 9));
+
+                timeLabel.setText((wholeTimeInSecond + firstTime - secondTime) / 60 + ":" + (wholeTimeInSecond + firstTime - secondTime) % 60);
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } while (secondTime - firstTime <= wholeTimeInSecond);
+            System.out.println("show time finish");
+        });
     }
 
+
+    public void setClient(Client client) {
+        this.client = client;
+        setGameInfo();
+    }
+
+    private void setGameInfo(){
+        fieldsString = client.getFields();
+        rounds = client.getRounds();
+        gameMode = client.getGameMode();
+        time = client.getTime();
+
+    }
 }
