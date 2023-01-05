@@ -1,5 +1,7 @@
 package com.example.newesmfamil2;
 
+import com.example.newesmfamil2.animaition.Fade;
+import com.example.newesmfamil2.animaition.Shaker;
 import io.github.palexdev.materialfx.controls.*;
 
 import java.io.*;
@@ -9,9 +11,11 @@ import io.github.palexdev.materialfx.controls.legacy.MFXLegacyTableView;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.ToggleGroup;
@@ -20,6 +24,7 @@ import javafx.scene.layout.AnchorPane;
 
 
 public class CreateGameController {
+    private final int MINIMUM_FIELD_NEEDED = 1;
 
     @FXML
     private AnchorPane rootPane;
@@ -82,31 +87,55 @@ public class CreateGameController {
     private MFXButton singleGameButton;
 
     @FXML
-    private MFXButton startGettingClientButton;
+    private MFXButton createGameButton;
 
     @FXML
     private MFXButton startGameButton;
 
     @FXML
+    private Label errorLabel;
+
+    @FXML
+    private Label hostNameFieldError;
+
+    @FXML
+    private Label gameNameFieldError;
+
+    @FXML
+    private Label roundsFieldError;
+
+    @FXML
+    private Label gameModeError;
+
+    @FXML
+    private Label timeError;
+
+    @FXML
     private MFXLegacyTableView<Client> playerNameTableView = new MFXLegacyTableView<>();
+
+    ArrayList<String> fields = new ArrayList<>();
 
     ObservableList<Client> playerNameList ;
 
     public Server server;
 
-    static DatabaseHandler databaseHandler = new DatabaseHandler();
+    public DatabaseHandler databaseHandler = new DatabaseHandler();
 
-    private boolean isGameCreated = false; //will be true when "startGettingClientButton" is pressed;
+    private boolean isGameCreated = false;
+
+    String hostName;
+    String gameName;
+    String password;
+    String mode;
+    int rounds;
+    int time;
 
     @FXML
     void initialize() {
 
-        ToggleGroup modeToggle = new ToggleGroup();
-        stopy.setToggleGroup(modeToggle);
-        timey.setToggleGroup(modeToggle);
-
-        ArrayList<String> fields = new ArrayList<>();
-
+        ToggleGroup gameModeToggle = new ToggleGroup();
+        stopy.setToggleGroup(gameModeToggle);
+        timey.setToggleGroup(gameModeToggle);
 
 
         timey.setOnAction(actionEvent -> {
@@ -117,10 +146,105 @@ public class CreateGameController {
         });
 
         //also, eventFilter can be implemented to consume event in some situations
-        startGettingClientButton.setOnAction(actionEvent -> {
-            isGameCreated = true;
+        createGameButton.addEventFilter(ActionEvent.ACTION, actionEvent -> {
+            fields.clear();
 
-            createTableView();
+            errorLabel.setText("");
+
+            hostNameField.setStyle("-fx-border-color: ");
+            timey.setStyle("-fx-border-color: ");
+            stopy.setStyle("-fx-border-color: ");
+            roundsField.setStyle("-fx-border-color: ");
+            gameNameField.setStyle("-fx-border-color: ");
+
+
+
+            if(isGameCreated){
+                errorLabel.setText("Game Is Already Created");
+                new Fade(errorLabel).fadeIn();
+
+                new Shaker(createGameButton).shake();
+//
+//                new Thread(()->{
+//                    try {
+//                        Thread.sleep(4000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    new Fade(errorLabel).fadeOut();
+//                }).start();
+
+                actionEvent.consume();
+            }
+
+            time = 0;
+            if(timey.isSelected()){
+                time = (int)timeSlider.getValue() * 60; // add needs //time is set in seconds
+                if(time==0){
+                    errorLabel.setText("Determine Game Time");
+                    new Fade(errorLabel).fadeIn();
+                    new Shaker(timeSlider).shake();
+
+                    actionEvent.consume();
+                }
+            }
+
+            if((gameModeToggle.getSelectedToggle())==null){
+                errorLabel.setText("Choose Game Mode");
+                new Fade(errorLabel).fadeIn();
+
+                timey.setStyle("-fx-border-color: red;");
+                stopy.setStyle("-fx-border-color: red;");
+                new Shaker(timey).shake();
+                new Shaker(stopy).shake();
+
+                actionEvent.consume();
+            }else
+                mode = ((RadioButton)gameModeToggle.getSelectedToggle()).getText();
+
+
+            rounds = 0;
+            try{
+                rounds = Integer.parseInt(roundsField.getText());
+            }catch(NumberFormatException e){
+                errorLabel.setText("Insert Only A Number(Integer) For Rounds");
+                new Fade(errorLabel).fadeIn();
+
+                roundsField.setStyle("-fx-border-color: red;");
+                new Shaker(roundsField).shake();
+
+                actionEvent.consume();
+            }
+
+            password = passwordField.getText();
+
+            gameName = gameNameField.getText();
+            if(gameName.equals("") || gameName.charAt(0)==' '){
+                errorLabel.setText("Invalid Game Name");
+                if(!gameName.equals(""))
+                    errorLabel.setText("Invalid Game Name(Shouldn't Start With Space)");
+                new Fade(errorLabel).fadeIn();
+
+                gameNameField.setStyle("-fx-border-color: red;");
+                new Shaker(gameNameField).shake();
+
+                actionEvent.consume();
+            }
+
+
+            hostName = hostNameField.getText();
+            if(hostName.equals("") || hostName.charAt(0)==' '){
+                errorLabel.setText("Invalid Name");
+                if(!hostName.equals(""))
+                    errorLabel.setText("Invalid Name(Shouldn't Start With Space)");
+                new Fade(errorLabel).fadeIn();
+
+                hostNameField.setStyle("-fx-border-color: red;");
+                new Shaker(hostNameField).shake();
+
+                actionEvent.consume();
+            }
+
 
             if (firstnameCheck.isSelected()) fields.add(firstnameCheck.getText());
             if (lastnameCheck.isSelected()) fields.add(lastnameCheck.getText());
@@ -134,19 +258,41 @@ public class CreateGameController {
             if (fruitCheck.isSelected()) fields.add(fruitCheck.getText());
             if (inanimateCheck.isSelected()) fields.add(inanimateCheck.getText());
 
-            String hostName = hostNameField.getText();
-            String gameName = gameNameField.getText();
-            String password = passwordField.getText();
-            String mode = ((RadioButton)(modeToggle.getSelectedToggle())).getText();
-            int rounds = 0;
-            try{
-                rounds = Integer.parseInt(roundsField.getText());
-            }catch(NumberFormatException e){
-                // add needs
+            if(fields.size()<MINIMUM_FIELD_NEEDED){
+                errorLabel.setText("Choose At Least " + MINIMUM_FIELD_NEEDED + " Field(s) To Create The Game");
+                new Fade(errorLabel).fadeIn();
+
+                actionEvent.consume();
             }
-            int time = 0;
-            if(timey.isSelected())
-                time = (int)timeSlider.getValue() * 60; // add needs //time is set in seconds
+        });
+
+
+        createGameButton.setOnAction(actionEvent -> {
+            isGameCreated = true;
+
+            firstnameCheck.setDisable(true);
+            lastnameCheck.setDisable(true);
+            cityCheck.setDisable(true);
+            countryCheck.setDisable(true);
+            clothsCheck.setDisable(true);
+            animalCheck.setDisable(true);
+            foodCheck.setDisable(true);
+            flowerCheck.setDisable(true);
+            carCheck.setDisable(true);
+            fruitCheck.setDisable(true);
+            inanimateCheck.setDisable(true);
+
+            hostNameField.setDisable(true);
+            gameNameField.setDisable(true);
+            passwordField.setDisable(true);
+            roundsField.setDisable(true);
+            stopy.setDisable(true);
+            timey.setDisable(true);
+            timeSlider.setDisable(true);
+
+            System.out.println("game created");
+
+            createTableView();
 
             server = ServerFactory.createServer(fields, hostName, gameName, password, rounds, mode, time);
             server.setCreateGameController(this);
@@ -158,27 +304,37 @@ public class CreateGameController {
 
         });
 
-        //remove created game from database if the window closes
-        Main.mainStage.setOnCloseRequest(windowEvent -> {
-            System.out.println("/////Im closingCreateGame.....");
-            if(server!=null){
-                databaseHandler.removeServer(server.getPort());
-                server.closeServerSocket();
-                server.closeSockets();
-            }
-        });
+
 
 
 
         //enough button
         //also, eventFilter can be implemented to consume event in some situations
-        startGameButton.setOnAction(actionEvent -> {
-            server.isGettingClientEnough = true;
-            Client client = new Client(hostNameField.getText());
+        startGameButton.addEventFilter(ActionEvent.ACTION, actionEvent -> {
+            if(!isGameCreated){
+                errorLabel.setText("Create The Game First");
+                new Fade(errorLabel).fadeIn();
+                new Shaker(startGameButton).shake();
 
+                actionEvent.consume();
+            }
+            if(server.getNumPlayers()<1){
+                errorLabel.setText("No One Has Been Joined The Game Yet!");
+                new Fade(errorLabel).fadeIn();
+
+                new Shaker(startGameButton).shake();
+
+                actionEvent.consume();
+            }
+        });
+        startGameButton.setOnAction(actionEvent -> {
+            server.isAcceptingClientEnough = true;
+
+            //make a Client class for host as well
+            Client client = new Client(hostNameField.getText());
             new Thread( ()->{
                 client.joinToServer(server.getPort());
-                client.waiteForStart();
+                client.waitForStart();
             }).start();
 
             try {
@@ -191,6 +347,16 @@ public class CreateGameController {
                 server.startGame();
             }).start();
 
+        });
+
+        //remove created game from database if the window closes
+        Main.mainStage.setOnCloseRequest(windowEvent -> {
+            System.out.println("/////Im closingCreateGame.....");
+            if(server!=null){
+                databaseHandler.removeServer(server.getPort());
+                server.closeServerSocket();
+                server.closeSockets();
+            }
         });
 
     }
@@ -216,21 +382,6 @@ public class CreateGameController {
     }
 
     public void gotoGameScreen(Client client){
-//
-//        new Thread(()->{
-//            Platform.runLater(()->{
-//                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
-//                try {
-//                    Parent root = fxmlLoader.load();
-//                    rootPane.getChildren().setAll(root);
-//        //            ((GameScreenController)fxmlLoader.getController()).setClient(client);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            });
-//        }).start();
-
 //        new Thread(()->{
             Platform.runLater(()->{
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));

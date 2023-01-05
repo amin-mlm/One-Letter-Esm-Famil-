@@ -64,13 +64,13 @@ public class ServerCellController extends MFXLegacyListCell<Server> {
                 if(passField.getText().equals(item.getPassword())){
 //                    new Thread(()->{
 //                        Platform.runLater(()->{
-                    ((JoinGameController)GameModeController.fxmlLoader.getController()).joinToServer(item.getPort());
+                    ((JoinGameController)GameModeController.fxmlLoader.getController()).joinToServer(item.getPort(), item.getGameName(), true);
 //                        });
 //                    }).start();
 //                    JoinGameController.waiteToStartGame(item.getId());
                 }
                 else{
-                    // add needs
+                    ((JoinGameController)GameModeController.fxmlLoader.getController()).joinToServer(item.getPort(), item.getGameName(), false);
                 }
             });
 

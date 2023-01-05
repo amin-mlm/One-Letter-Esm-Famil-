@@ -1,6 +1,7 @@
 package com.example.newesmfamil2;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -39,9 +40,13 @@ public class Client {
         this.rank = rank;
     }
 
-    public void joinToServer(int gameId) {
+    public int joinToServer(int gameId) {
         try {
-            socket = new Socket(ServerFactory.MAIN_HOST, gameId);
+//            try{
+                socket = new Socket(ServerFactory.MAIN_HOST, gameId);
+//            }catch(ConnectException e){ //the game has been closed
+//                return -1;
+//            }
             System.out.println("in client "+socket);
             scanner = new Scanner(
                     new BufferedReader(
@@ -58,6 +63,8 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return 0;
     }
 
     private void exchangeInfo() {
@@ -75,14 +82,14 @@ public class Client {
 
     }
 
-    public void waiteForStart() {
+    public int waitForStart() {
         System.out.println("client listening for plan...");
         try {
             plan = scanner.nextLine();
         }catch (NoSuchElementException e){ //host left the game
-            System.out.println("----noSuch1");
-            joinGameController.notifHostLeftGame();
-            return;
+            System.out.println("----noSuch 1(plan)");
+//            joinGameController.notifHostLeftGame();
+            return -1;
         }
         numOfAllPlayers = Integer.parseInt(scanner.nextLine());
         indexBetweenAllPlayers = Integer.parseInt(scanner.nextLine());
@@ -104,11 +111,17 @@ public class Client {
 
             // write s.t to play for game
         }
+        return 0;
     }
 
     public int sendAlphabet(String alphabetChar) {
         printWriter.println(alphabetChar);
-        return Integer.parseInt(scanner.nextLine());
+        try{
+            return Integer.parseInt(scanner.nextLine());
+        }catch (NoSuchElementException e){
+            gameScreenController.notifHostLeftGame();
+            return -2;
+        }
     }
 
 
@@ -120,7 +133,7 @@ public class Client {
         try{
             return scanner.nextLine().charAt(0);
         }catch (NoSuchElementException e){ //host left the game
-            System.out.println("----noSuch2");
+            System.out.println("----noSuch 2(alphabet)");
             gameScreenController.notifHostLeftGame();
             return ' ';
         }
@@ -131,7 +144,7 @@ public class Client {
         try{
             message = scanner.nextLine();
         }catch (NoSuchElementException e){ //host left the game
-            System.out.println("----noSuch3");
+            System.out.println("----noSuch 3(send answer)");
             gameScreenController.notifHostLeftGame();
             return null;
         }
@@ -151,9 +164,15 @@ public class Client {
         printWriter.println(answer);
         ArrayList<String> othersAnswers = new ArrayList<>();
         for (int i = 0; i < numOfAllPlayers - 1; i++) {
-            String otherAnswer = scanner.nextLine();
-            System.out.println("gathered answer " + otherAnswer + " where i is " + i + " and numPL is " + numOfAllPlayers);
-            othersAnswers.add(otherAnswer);
+            try {
+                String otherAnswer = scanner.nextLine();
+                System.out.println("gathered answer " + otherAnswer + " where i is " + i + " and numPL is " + numOfAllPlayers);
+                othersAnswers.add(otherAnswer);
+            }catch (NoSuchElementException e){
+                System.out.println("----noSuch 4(otherAnswers)");
+                gameScreenController.notifHostLeftGame();
+                return null;
+            }
         }
         System.out.println(othersAnswers + " returned from client to gameScreen");
         return othersAnswers;
@@ -162,11 +181,24 @@ public class Client {
 
     public int sendReactionsAndGetPoint(ArrayList<String> reactions) {
         for (int i = 0; i < reactions.size(); i++) {
+            System.out.println("client sent " + reactions.get(i));
             printWriter.println(reactions.get(i));
         }
-        return Integer.parseInt(scanner.nextLine());
+        try{
+            int point = Integer.parseInt(scanner.nextLine());
+            System.out.println("client received point " + point);
+            return point;
+        }catch(NoSuchElementException e){
+            System.out.println("----noSuch 5(point)");
+            gameScreenController.notifHostLeftGame();
+            return -1;
+        }
     }
 
+
+    public Socket getSocket() {
+        return socket;
+    }
 
     public String getName() {
         return name;
@@ -217,7 +249,13 @@ public class Client {
     }
 
     public int listenToRoundScore() {
-        return Integer.parseInt(scanner.nextLine());
+        try{
+            return Integer.parseInt(scanner.nextLine());
+        }catch (NoSuchElementException e){
+            System.out.println("----noSuch 6(roundScore)");
+            gameScreenController.notifHostLeftGame();
+            return -1;
+        }
     }
 
     public String listenToClientNameForScoreBoard() {

@@ -1,5 +1,7 @@
 package com.example.newesmfamil2;
 
+import com.example.newesmfamil2.animaition.Fade;
+import com.example.newesmfamil2.animaition.Shaker;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import io.github.palexdev.materialfx.controls.legacy.MFXLegacyListView;
@@ -37,10 +39,15 @@ public class JoinGameController {
 
     private DatabaseHandler databaseHandler = new DatabaseHandler();
 
-    private int gamePort = -1;
+    private int gamePort;
+
+    private String gameName;
 
     @FXML
     void initialize() {
+        gamePort =-1;
+
+//        serversObservableList.clear();
         ArrayList<Server> servers = databaseHandler.showServers();
         System.out.println("in JoinGameContro: " + servers.size());
         serversObservableList = FXCollections.observableArrayList();
@@ -55,31 +62,73 @@ public class JoinGameController {
 
     }
 
-    public void joinToServer(int gamePort){
+    public void joinToServer(int gamePort, String gameName, boolean isPasswordCorrect){
+        clientNameField.setStyle("-fx-border-color: ");
+
         if(this.gamePort!=-1){ //game is already chosen
+            gameStateLabel.setText("You Have Entered To " + this.gameName + "'s Game" +
+                    "\nwait for others to join...");
+            new Fade(gameStateLabel).fadeIn();
+
             return;
         }
+        if(clientNameField.getText().equals("") || clientNameField.getText().charAt(0)==' '){
+            gameStateLabel.setText("Enter Your Name");
+            if(!clientNameField.getText().equals(""))
+                gameStateLabel.setText("Enter A Valid Name(Shouldn't Start With Space)");
+            new Fade(gameStateLabel).fadeIn();
+
+            clientNameField.setStyle("-fx-border-color: red");
+            new Shaker(clientNameField).shake();
+
+            return;
+        }
+        if(!databaseHandler.isServerExist(gamePort)){
+            gameStateLabel.setText(":(\nThe Game Doesn't Exist Anymore");
+            new Fade(gameStateLabel).fadeIn();
+
+            clientNameField.setDisable(false);
+
+            initialize();
+            return;
+        }
+        if(!isPasswordCorrect){
+            gameStateLabel.setText("Wrong Password!");
+            new Fade(gameStateLabel).fadeIn();
+
+            return;
+        }
+
+        clientNameField.setDisable(true);
         this.gamePort = gamePort;
+        this.gameName = gameName;
 
-        //if client name was empty add needs
-        String clientName = clientNameField.getText();
+        sayWelcome(gameName);
 
-        sayWelcome(gamePort);
-
-        Client client = new Client(clientName);
+        Client client = new Client(clientNameField.getText());
 
         new Thread( ()->{
             client.setJoinGameController(this);
             client.joinToServer(gamePort);
-            client.waiteForStart();
+            int result = client.waitForStart();
+            if(result == -1){ //host left the game
+                client.closeSocket();
+
+                Platform.runLater(()->{
+                    gameStateLabel.setText(":(\nHost Left The Game, Choose Another Game");
+                    clientNameField.setDisable(false);
+                    new Fade(gameStateLabel).fadeIn();
+                    initialize();
+                });
+            }
         }).start();
 
 
     }
 
-    private void sayWelcome(int gameId){
-        gameStateLabel.setText("welcome to gameId " + gameId +
-                "\nwaite for others to join");
+    private void sayWelcome(String gameName){
+        gameStateLabel.setText("Welcome To " + gameName + "'s Game" +
+                "\nwait for others to join...");
         //add needs
     }
 
@@ -116,9 +165,9 @@ public class JoinGameController {
     }
 
 
-    public void notifHostLeftGame() {
-        Platform.runLater(()->{
-            gameStateLabel.setText(":(");
-        });
-    }
+//    public void notifHostLeftGame() {
+//        Platform.runLater(()->{
+//            gameStateLabel.setText(":(");
+//        });
+//    }
 }

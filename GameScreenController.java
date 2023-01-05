@@ -1,5 +1,6 @@
 package com.example.newesmfamil2;
 
+import com.example.newesmfamil2.animaition.Shaker;
 import io.github.palexdev.materialfx.controls.MFXButton;
 
 import java.io.IOException;
@@ -55,6 +56,9 @@ public class GameScreenController {
     private Label stateLabel;
 
     @FXML
+    private Label roundLabel;
+
+    @FXML
     private MFXLegacyListView<Client> scoreBoardListView;
 
     @FXML
@@ -93,12 +97,17 @@ public class GameScreenController {
 
     private int sumScore = 0;
 
+    private boolean hostLeftGame = false;
+
 
     @FXML
     void initialize() {
 
 
         prepareFieldPane();
+        Platform.runLater(()->{
+            roundLabel.setText("Round " + thisRound + "/" + rounds);
+        });
 
         myTurnToDetermineAlphabet = Integer.parseInt(plan.charAt(thisRound - 1) + "") == 1;
 
@@ -116,7 +125,7 @@ public class GameScreenController {
 
         alphabetButton.setOnAction(actionEvent -> {
             new Thread(() -> {
-                if(sendAlphabet()==0){
+                if(sendAlphabet()==0){ //input alphabet is valid
                     if(listenForAlphabet()==-1) //host left the game
                         return;
                     startGame();
@@ -127,7 +136,22 @@ public class GameScreenController {
         finishButton.setOnAction(actionEvent -> {
             for (int i = 0; i < textFields.size(); i++) {
                 if(textFields.get(i).getText().equals("")){
-                    //add needs
+                    new Shaker(finishButton).shake();
+
+                    new Thread(()->{
+                        Platform.runLater(()->{
+                            finishButton.setText("F I N I S H !\n(you have some empty fields yet)");
+                        });
+                        try {
+                            Thread.sleep(3000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        Platform.runLater(()->{
+                            finishButton.setText("F I N I S H !");
+                        });
+                    }).start();
+
                     break;
                 }
                 if(i==fieldsString.size()-1)
@@ -163,17 +187,26 @@ public class GameScreenController {
         alphabetButton.setDisable(false);
         alphabetButton.setVisible(true);
 
-        alphabetLabel.setText("Determine Game Alphabet Below");
+        Platform.runLater(()->{
+            alphabetLabel.setText("Determine Game Alphabet Below");
+        });
     }
 
 
     private int sendAlphabet() {
+        alphabetField.setStyle("-fx-border-color: ");
 
         String alphabetString = alphabetField.getText();
         char alphabetChar = alphabetString.charAt(0);
 
         if (alphabetString.length() != 1) {
-            // add needs
+            alphabetField.setStyle("-fx-border-color: red");
+            Platform.runLater(()->{
+                alphabetField.setText("");
+                alphabetField.setPromptText("Only 1 letter");
+            });
+            new Shaker(alphabetField).shake();
+
             return -1; //code for invalid char error
         }
         if (!((alphabetChar >= 65 && alphabetChar <= 90) || (alphabetChar >= 97 && alphabetChar <= 122))) {
@@ -191,6 +224,8 @@ public class GameScreenController {
                 System.out.println("gameScreen: repeated alpha try again");
                 // add needs for being repeated alphabet
                 return -1; //code for invalid char error
+            }else if(result == -2){ //host left game
+                return -1;
             }
         }
 
@@ -229,10 +264,20 @@ public class GameScreenController {
 
                     String answer = removeSpaceFromAnswer(textFields.get(i).getText());
                     ArrayList<String> othersAnswers = client.sendAnswerAndGetOthersAnswers(answer);
+                    if(othersAnswers==null){ //host left the game
+                        return;
+                    }
+
 
                     System.out.println("gameScreen, othersAnswer: " + othersAnswers);
 
                     int point = sendReactionAndGetPoint(othersAnswers, fieldsString.get(i));
+                    System.out.println("point for textField " + i + " = " + point);
+
+                    if(point==-1){
+//                        hostLeftGame = true;
+                        return;
+                    }
 
                     sumScore += point;
 
@@ -246,14 +291,23 @@ public class GameScreenController {
 
                 if (++thisRound <= rounds) {
 
-                    prepareNextRound();
+                    int result = prepareNextRound();
+                    if(result==-1)
+                        return;
+
                     nextRound();
 
                 }else{
-                    prepareNextRound();
+                    int result = prepareNextRound();
+                    if(result==-1) //host left game
+                        return;
+                    System.out.println("radradradradrad");
 
                     alphabetLabel.setVisible(false);
                     alphabetLabel.setDisable(true);
+
+                    roundLabel.setVisible(false);
+                    roundLabel.setDisable(true);
 
                     scoreBoardListView.setVisible(true);
                     scoreBoardListView.setDisable(false);
@@ -267,13 +321,15 @@ public class GameScreenController {
                         int finalScore = client.listenToClientScoreForScoreBoard();
 
                         System.out.println("*** final scores i:" + i + ", score:" + finalScore);
+
+                        //calculate rank
                         int rank;
                         if(i==0)
                             rank = 1;
                         else{
-                            if(finalScore==clientsObservableList.get(i-1).getFinalScore()){
+                            if(finalScore==clientsObservableList.get(i-1).getFinalScore())
                                 rank = lastRank;
-                            }else
+                            else
                                 rank = ++lastRank;
                         }
 
@@ -311,7 +367,7 @@ public class GameScreenController {
         if (gameMode.equals("Game Is Finished When The Time Is Over")) {
             System.out.println("game is timeyy");
 
-            showTime(/*time*/30);
+            showTime(/*time*/10);
 
             System.out.println("time finished");
 
@@ -354,8 +410,12 @@ public class GameScreenController {
         return answer.substring(0, answer.length()-1); //remove last space
     }
 
-    private void prepareNextRound() {
+    private int prepareNextRound() {
         int thisRoundScore = client.listenToRoundScore();
+        System.out.println("\n" + thisRoundScore + "\n");
+        if(thisRoundScore == -1) //host left game
+            return -1;
+
         stateLabel.setVisible(true);
         stateLabel.setDisable(false);
 
@@ -397,6 +457,7 @@ public class GameScreenController {
         stateLabel.setVisible(false);
         stateLabel.setDisable(true);
 
+        return 0;
     }
     private void nextRound() {
 
@@ -470,6 +531,11 @@ public class GameScreenController {
 
         showTime(7 * othersAnswers.size()/* + 10*/ /*add needs (just delete this)*/);
 
+//        if(client.getSocket().isInputShutdown()){ //is socket closed from server side? (or did host leave game)
+//            System.out.println("gameScreen returned");
+//            return -1;
+//        }
+
 
         ArrayList<String> reactions = new ArrayList<>();
         index = 0;
@@ -501,16 +567,22 @@ public class GameScreenController {
                     e.printStackTrace();
                 }
             }
-            if(toggleGroups.get(index).getSelectedToggle().equals(radioButtonsYes.get(index))){
-                reactions.add("Positive");
-            }else{
-                reactions.add("Negative");
+            System.out.println("--gameScreen if");
+
+            try{
+                if(toggleGroups.get(index).getSelectedToggle().equals(radioButtonsYes.get(index))){
+                    reactions.add("Positive");
+                }else{
+                    reactions.add("Negative");
+                }
+                index++;
+            }catch (NullPointerException e){ //host left game
+//                return -1;
             }
-            index++;
         }
 
         try {
-            Thread.sleep(1000); //"Yes" ticked automatically is visible on screen
+            Thread.sleep(1000); //"Yes" automatically ticked is visible on screen
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -540,7 +612,6 @@ public class GameScreenController {
         return -1;
     }
 
-
     private int listenForAlphabet() {
         Platform.runLater(()->{
             alphabetLabel.setText("Let Game Alphabet Be Determined ..."); //add needs
@@ -557,9 +628,6 @@ public class GameScreenController {
 
         return 0;
     }
-
-
-
 
 
     private void showTime(int time) {
@@ -622,6 +690,8 @@ public class GameScreenController {
 
 
     public void notifHostLeftGame() {
+        hostLeftGame = true;
+
         fieldPane.setVisible(false);
         fieldPane.setDisable(true);
 
@@ -630,6 +700,18 @@ public class GameScreenController {
 
         alphabetLabel.setVisible(false);
         alphabetLabel.setDisable(true);
+
+        roundLabel.setVisible(false);
+        roundLabel.setDisable(true);
+
+        timeLabel.setVisible(false);
+        timeLabel.setDisable(true);
+
+        alphabetLabel.setVisible(false);
+        alphabetLabel.setDisable(true);
+
+        alphabetButton.setVisible(false);
+        alphabetButton.setDisable(true);
 
         stateLabel.setVisible(true);
         stateLabel.setDisable(false);

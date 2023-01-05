@@ -29,10 +29,10 @@ public class Server {
     private String serverPlan;
     private ArrayList<Character> usedAlphabets = new ArrayList<>();
 
-    boolean isGettingClientEnough = false;
+    boolean isAcceptingClientEnough = false;
     boolean didClientsSendAnswers = false;
 
-    int numPlayers = 0;
+    private int numPlayers = 0;
 
     private ArrayList<Socket> sockets = new ArrayList<>();
     private ArrayList<Scanner> scanners = new ArrayList<>();
@@ -45,6 +45,7 @@ public class Server {
     private ArrayList<String> clientsName = new ArrayList<>();
 
     ServerSocket serverSocket = null;
+    private boolean hostLeftGame = false;
 
     public Server(int port, String password, ArrayList<String> fields, String hostName, String gameName, int rounds, String gameMode, int time) {
         this.fields = fields;
@@ -66,7 +67,7 @@ public class Server {
             e.printStackTrace();
         }
 
-        while (!isGettingClientEnough) {
+        while (!isAcceptingClientEnough) {
 
             Socket socket = null;
             Scanner scanner = null;
@@ -185,9 +186,9 @@ public class Server {
                 else
                     clientPlan += "0";
             }
-            printWriters.get(i).println(clientPlan);
-            printWriters.get(i).println(numPlayers + "");
-            printWriters.get(i).println(i + "");
+            printWriters.get(i).println(clientPlan); //send plan
+            printWriters.get(i).println(numPlayers + ""); //send numPlayers
+            printWriters.get(i).println(i + ""); //send index between all clients
 
         }
 
@@ -212,7 +213,7 @@ public class Server {
                 try {
                     message = scanners.get(relatedIndex).nextLine();
                 }catch (NoSuchElementException e){
-                    System.out.println("----noSuch SERVER 1");
+                    System.out.println("----noSuch SERVER 2(finish message)");
                     return;
                 }
                 System.out.println("message in server form client no." + relatedIndex + ", " + message);
@@ -227,7 +228,9 @@ public class Server {
                         e.printStackTrace();
                     }
                     //nothing
+
                     collectAndCheckAnswers(relatedIndex);
+
                 } else if (message.equals("I Will Send The Answer Now")) {
                     //nothing
                 }
@@ -257,7 +260,8 @@ public class Server {
                         try {
                             answer = scanners.get(index).nextLine();
                         }catch (NoSuchElementException e){
-                            System.out.println("----noSuch SERVER 2");
+                            System.out.println("----noSuch SERVER 3(answer)");
+                            hostLeftGame = true;
                             return;
                         }
                         answers.add(answer);
@@ -275,9 +279,17 @@ public class Server {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    
+                    if (hostLeftGame)
+                        return;
+                    
                 }
                 System.out.println("server, checking answers: " + answers);
+
                 points = getReactionsAndCalculatePoints(answers, fields.get(i));
+
+                if(points==null) //host left game
+                    return;
 
                 //send clients points
                 for (int j = 0; j < printWriters.size(); j++) {
@@ -359,9 +371,12 @@ public class Server {
 
     public void closeSockets() {
         //disconnect sockets
+        System.out.println("AALL closed");
         for (int i = 0; i < sockets.size(); i++) {
             try {
                 sockets.get(i).close();
+                printWriters.get(i).close();
+                scanners.get(i).close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -397,8 +412,10 @@ public class Server {
         ArrayList<ArrayList<String>> allReactions = new ArrayList<>();
         for (index = 0; index < numPlayers; index++) {
             ArrayList<String> reactionsOfOnePlayer = new ArrayList<>();
+
+            //send other answers of players to them
             for (int i = 0; i < numPlayers; i++) {
-                if (index == i)
+                if (index == i) //no need to send one's answer to oneself
                     continue;
                 System.out.println("send answer: " + answers.get(i) + " to client no." + index);
                 printWriters.get(index).println(answers.get(i));
@@ -417,12 +434,14 @@ public class Server {
                     try {
                         reaction = scanners.get(relatedIndex).nextLine();
                     }catch (NoSuchElementException e){
-                        System.out.println("----noSuch SERVER 3");
+                        System.out.println("----noSuch SERVER 4(reaction)");
+                        hostLeftGame = true;
                         return;
                     }
                     System.out.println("reaction of player " + relatedIndex + "to player " + i + " is: " + reaction);
                     reactionsOfOnePlayer.add(reaction);
                 }
+                System.out.println("---omran ino bbini");
                 allReactions.add(reactionsOfOnePlayer);
             }).start();
 
@@ -434,11 +453,17 @@ public class Server {
 
         }
 
-        while (allReactions.size() != numPlayers) {
+        System.out.println("--- server while " + allReactions.size()  + "," +  numPlayers);
+        while (allReactions.size() != scanners.size()) {
             try {
-                Thread.sleep(500);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+
+            if(hostLeftGame){
+                System.out.println("--- server returned");
+                return null;
             }
         }
 
@@ -489,7 +514,7 @@ public class Server {
         try {
             alphabetString = scanners.get(playerIndex).nextLine();
         }catch (NoSuchElementException e){
-            System.out.println("----noSuch SERVER 4");
+            System.out.println("----noSuch SERVER 1(alphabet)");
             return;
         }
         char alphabetChar = alphabetString.charAt(0);
@@ -552,5 +577,8 @@ public class Server {
         this.createGameController = createGameController;
     }
 
+    public int getNumPlayers() {
+        return numPlayers;
+    }
 }
 
