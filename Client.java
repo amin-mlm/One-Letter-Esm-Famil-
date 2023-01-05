@@ -97,33 +97,7 @@ public class Client {
 
 
 
-    public ArrayList<String> getFields() {
-        return fields;
-    }
 
-    public String getGameMode() {
-        return gameMode;
-    }
-
-    public int getRounds() {
-        return rounds;
-    }
-
-    public int getTime() {
-        return time;
-    }
-
-    public int getIndexBetweenAllPlayers() {
-        return indexBetweenAllPlayers;
-    }
-
-    public String getPlan() {
-        return plan;
-    }
-
-    public void setGameScreenController(GameScreenController gameScreenController) {
-        this.gameScreenController = gameScreenController;
-    }
 
 
     public char listenForAlphabet() {
@@ -161,6 +135,46 @@ public class Client {
         for (int i = 0; i < reactions.size(); i++) {
             printWriter.println(reactions.get(i));
         }
+        return Integer.parseInt(scanner.nextLine());
+    }
+
+
+
+
+
+    public ArrayList<String> getFields() {
+        return fields;
+    }
+
+    public String getGameMode() {
+        return gameMode;
+    }
+
+    public int getRounds() {
+        return rounds;
+    }
+
+    public int getTime() {
+        return time;
+    }
+
+    public int getIndexBetweenAllPlayers() {
+        return indexBetweenAllPlayers;
+    }
+
+    public String getPlan() {
+        return plan;
+    }
+
+    public int getNumOfAllPlayers() {
+        return numOfAllPlayers;
+    }
+
+    public void setGameScreenController(GameScreenController gameScreenController) {
+        this.gameScreenController = gameScreenController;
+    }
+
+    public int listenToRoundScore() {
         return Integer.parseInt(scanner.nextLine());
     }
 }

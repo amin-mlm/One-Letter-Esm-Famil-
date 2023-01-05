@@ -1,5 +1,7 @@
 package com.example.newesmfamil2;
 
+import java.util.ArrayList;
+
 public class TestThread {
     static int i;
     public static void main(String[] args) throws InterruptedException {
@@ -17,7 +19,17 @@ public class TestThread {
 //            }).start();
 //            Thread.sleep(1);
 //        }
-        if(0/3>0.5)
-        System.out.println();
+
+        ArrayList<Integer> aa = new ArrayList<>();
+        aa.add(10);
+        aa.add(11);
+        aa.add(12);
+        System.out.println(aa);
+
+//        int temp = aa.get(1);
+//        aa.remove(1);
+//        aa.add(1, 5+temp);
+        aa.set(1, 16);
+        System.out.println(aa);
     }
 }

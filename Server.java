@@ -13,7 +13,7 @@ public class Server {
     private String gameName;
     private String password;
 
-    private int rate = 60;
+    private int rate = 50;
 
     private int numFields;
     private ArrayList<String> fields;
@@ -34,6 +34,10 @@ public class Server {
     private ArrayList<Scanner> scanners = new ArrayList<>();
     private ArrayList<PrintWriter> printWriters = new ArrayList<>();
     private ArrayList<String> clientsName = new ArrayList<>();
+
+
+    private ArrayList<Integer> clientsThisRoundPoints = new ArrayList<>();
+    private ArrayList<Integer> clientsSumPoints = new ArrayList<>();
 
     public Server(int port, String password, ArrayList<String> fields, String hostName, String gameName, int rounds, String gameMode, int time) {
         this.fields = fields;
@@ -110,6 +114,11 @@ public class Server {
         System.out.println("in server, playernames");
         for (String s : clientsName) System.out.println(s);
 
+        for (int i = 0; i < numPlayers; i++) {
+            clientsSumPoints.add(0);
+            clientsThisRoundPoints.add(0);
+        }
+
         //bring host from last to first of arrayLists
         Socket lastSocket = sockets.get(sockets.size() - 1);
         sockets.remove(sockets.size() - 1);
@@ -152,11 +161,9 @@ public class Server {
         }
 
 
-        sendNotif();
-
-        //ye go to game screen inja buddaaaaaaaaaaaaaaaaaa gozashtam too io.txt file
 
         new Thread(() -> { //can be without thread? yes I think
+            sendGoToGameTOCLients();
             determineAlphabet();
             waiteToFinishRoundAndCheckAnswers();
         }).start();
@@ -216,7 +223,7 @@ public class Server {
                     }).start();
 
                     try {
-                        Thread.sleep(1); //can be 1? yes 99%
+                        Thread.sleep(50); //can be 1? yes 99%++
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -235,17 +242,39 @@ public class Server {
                     printWriters.get(j).println(points.get(j));
                 }
 
+                for (int j = 0; j < points.size(); j++) {
+                    clientsThisRoundPoints.set(j, clientsSumPoints.get(j) + Integer.parseInt(points.get(j)));
 
-                try {
-                    Thread.sleep(14000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    clientsSumPoints.set(j, clientsSumPoints.get(j) + Integer.parseInt(points.get(j)));
                 }
+
+
+                if(i==fields.size()-1)
+                    try {
+                        Thread.sleep(16000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                else
+                    try {
+                        Thread.sleep(14000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
 
             }
 
             if(++thisRound<=rounds){
+                ///clientsThisRoundPoints=0 shavac
+                for (int i = 0; i < printWriters.size(); i++) {
+                    printWriters.get(i).println(clientsThisRoundPoints.get(i)+"");
+                }
+                for (int j = 0; j < clientsThisRoundPoints.size(); j++) {
+                    clientsThisRoundPoints.set(j, 0);
+                }
+                nextRound();
+            }else{
 
             }
 
@@ -255,8 +284,11 @@ public class Server {
 
         for (int j = 0; j < printWriters.size(); j++)
             printWriters.get(j).println("Send Your Answers");
+    }
 
-
+    private void nextRound() {
+        determineAlphabet();
+        waiteToFinishRoundAndCheckAnswers();
     }
 
 
@@ -389,7 +421,7 @@ public class Server {
         }
     }
 
-    private void sendNotif() {
+    private void sendGoToGameTOCLients() {
         for (PrintWriter p : printWriters) {
             p.println("go to game");
         }
