@@ -291,6 +291,11 @@ public class Server {
                 }
                 nextRound();
             } else {
+                //send round scores to all clients
+                for (int i = 0; i < printWriters.size(); i++) {
+                    printWriters.get(i).println(clientsThisRoundPoints.get(i) + "");
+                }
+
                 //sort clients name by final score
 outer:          for (int i = 0; i < clientsSumPoints.size(); i++) {
                     boolean shouldBreak = true;

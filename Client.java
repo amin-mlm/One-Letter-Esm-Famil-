@@ -22,6 +22,7 @@ public class Client {
     private PrintWriter printWriter;
 
     private int finalScore;
+    private int rank;
 
     private GameScreenController gameScreenController;
 
@@ -31,9 +32,10 @@ public class Client {
         this.name = name;
     }
 
-    public Client(String name, int finalScore) {
+    public Client(String name, int finalScore, int rank) {
         this.name = name;
         this.finalScore = finalScore;
+        this.rank = rank;
     }
 
     public void joinToServer(int gameId) {
@@ -180,6 +182,10 @@ public class Client {
 
     public int getFinalScore() {
         return finalScore;
+    }
+
+    public int getRank() {
+        return rank;
     }
 
     public void setFinalScore(int finalScore) {

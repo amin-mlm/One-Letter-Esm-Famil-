@@ -54,7 +54,7 @@ public class GameScreenController {
 //    private MFXLegacyTableView<String> resultTable;
 
 
-    private Client client;
+    static Client client;
 
     private ArrayList<String> fieldsString = new ArrayList<>();
 
@@ -212,6 +212,8 @@ public class GameScreenController {
                     nextRound();
 
                 }else{
+                    prepareNextRound();
+
                     fieldPane.setVisible(false);
                     fieldPane.setDisable(true);
 
@@ -223,18 +225,32 @@ public class GameScreenController {
 
                     client.setFinalScore(sumScore);
 
+                    int lastRank=1;
                     ObservableList<Client> clientsObservableList = FXCollections.observableArrayList();
                     for (int i = 0; i < client.getNumOfAllPlayers(); i++) {
                         String name = client.listenToClientNameForScoreBoard();
-                        int score = client.listenToClientScoreForScoreBoard();
+                        int finalScore = client.listenToClientScoreForScoreBoard();
 
-                        System.out.println("*** final scores i:" + i + ", score:" + score);
-                        Client client = new Client(name, score);
+                        System.out.println("*** final scores i:" + i + ", score:" + finalScore);
+                        int rank;
+                        if(i==0) rank = 1;
+                        else{
+                            if(finalScore==clientsObservableList.get(i-1).getFinalScore()){
+                                rank = lastRank;
+                            }else
+                                rank = ++lastRank;
+                        }
+//                        if(i>0 && finalScore==clientsObservableList.get(i-1).getFinalScore())
+//                            rank = i;
+//                        else
+//                            rank = i+1;
+                        Client client = new Client(name, finalScore, rank);
 
                         clientsObservableList.add(client);
                     }
                     scoreBoardListView.setItems(clientsObservableList);
                     scoreBoardListView.setCellFactory(param -> new ClientCellController());
+
 
                     //add needs
 
