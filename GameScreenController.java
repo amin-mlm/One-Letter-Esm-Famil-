@@ -106,14 +106,12 @@ public class GameScreenController {
 
         if (myTurnToDetermineAlphabet) {   //it can be 0 or 1       because thisRound starts from 1
             System.out.println("TURN ME");
-            alphabetField.setDisable(false);
-            alphabetField.setVisible(true);
-            alphabetButton.setDisable(false);
-            alphabetButton.setVisible(true);
+            prepareToDetermineAlphabet();
         } else {
             System.out.println("NOT TURN ME");
             new Thread(() -> {
-                listenForAlphabet();
+                if(listenForAlphabet()==-1)
+                    return;
                 startGame();
             }).start();
         }
@@ -122,7 +120,8 @@ public class GameScreenController {
         alphabetButton.setOnAction(actionEvent -> {
             new Thread(() -> {
                 if(sendAlphabet()==0){
-                    listenForAlphabet();
+                    if(listenForAlphabet()==-1)
+                        return;
                     startGame();
                 }
             }).start();
@@ -150,8 +149,25 @@ public class GameScreenController {
         });
 
 
+//        Main.mainStage.setOnCloseRequest(windowEvent -> {
+//            System.out.println("/////Im closingGameScreen.....");
+//
+////                databaseHandler.removeServer(server.getPort());
+////                server.closeServerSocket();
+//                client.closeSocket();
+//
+//        });
+
     }
 
+    private void prepareToDetermineAlphabet() {
+        alphabetField.setDisable(false);
+        alphabetField.setVisible(true);
+        alphabetButton.setDisable(false);
+        alphabetButton.setVisible(true);
+
+        alphabetLabel.setText("Determine Game Alphabet Below");
+    }
 
 
     private int sendAlphabet() {
@@ -187,6 +203,8 @@ public class GameScreenController {
     private void startGame() {
         new Thread(() -> {
             String message = client.listenToSendAnswerMessage();
+            if(message==null) //host left the game
+                return;
             if (message.equals("Send Your Answers")) {
                 Platform.runLater(() -> {
                     finishButton.setVisible(false);
@@ -325,11 +343,7 @@ public class GameScreenController {
     }
 
     private void closeCurrentGame() {
-        try {
-            client.closeGame();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        client.closeSocket();
     }
 
     private String removeSpaceFromAnswer(String primaryAnswer) {
@@ -530,16 +544,21 @@ public class GameScreenController {
     }
 
 
-    private void listenForAlphabet() {
+    private int listenForAlphabet() {
         Platform.runLater(()->{
             alphabetLabel.setText("Let Game Alphabet Be Determined ..."); //add needs
         });
 
-        alphabet = Character.toUpperCase(client.listenForAlphabet()) ;
+        alphabet = Character.toUpperCase(client.listenForAlphabet());
+        if(alphabet==' ') //host left the game
+            return -1;
+
 
         Platform.runLater(() -> {
             alphabetLabel.setText("Go With ' " +alphabet + " '");
         });
+
+        return 0;
     }
 
 
@@ -604,7 +623,22 @@ public class GameScreenController {
 
     }
 
-    public void sendReactions(ArrayList<String> reactions) {
-        client.sendReactionsAndGetPoint(reactions);
+
+    public void notifHostLeftGame() {
+        fieldPane.setVisible(false);
+        fieldPane.setDisable(true);
+
+        finishButton.setVisible(false);
+        finishButton.setDisable(true);
+
+        alphabetLabel.setVisible(false);
+        alphabetLabel.setDisable(true);
+
+        stateLabel.setVisible(true);
+        stateLabel.setDisable(false);
+
+        Platform.runLater(()->{
+            stateLabel.setText(":(");
+        });
     }
 }

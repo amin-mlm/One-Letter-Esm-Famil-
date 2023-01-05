@@ -3,7 +3,9 @@ package com.example.newesmfamil2;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Server {
@@ -42,6 +44,8 @@ public class Server {
     private ArrayList<Integer> clientsSumPoints = new ArrayList<>();
     private ArrayList<String> clientsName = new ArrayList<>();
 
+    ServerSocket serverSocket = null;
+
     public Server(int port, String password, ArrayList<String> fields, String hostName, String gameName, int rounds, String gameMode, int time) {
         this.fields = fields;
         if (fields != null) //we need to create some deficient
@@ -55,8 +59,7 @@ public class Server {
         this.time = time;
     }
 
-    public void startGettingClient() {
-        ServerSocket serverSocket = null;
+    public void startAcceptingClient() {
         try {
             serverSocket = new ServerSocket(port);
         } catch (IOException e) {
@@ -70,7 +73,12 @@ public class Server {
             PrintWriter printwriter = null;
 
             try {
-                socket = serverSocket.accept();
+                try{
+                    socket = serverSocket.accept();
+                }catch (SocketException e){ //if the player closes the window, serverSocket.accept() throws exception
+                    System.out.println("exception passed");
+                    return;
+                }
                 System.out.println("in Server " + socket);
                 scanner = new Scanner(
                         new BufferedReader(
@@ -96,7 +104,11 @@ public class Server {
 
         }
 
+        //remove game from database
+        new DatabaseHandler().removeServer(port);
+
         try {
+            System.out.println("serverSocket closed after finishing gettingClient");
             serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -120,6 +132,15 @@ public class Server {
         return name;
     }
 
+     void closeServerSocket(){
+        if(!serverSocket.isClosed())
+            try {
+                System.out.println("now sreverSocket closed");
+                serverSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
 
     public void startGame() {
         System.out.println("in server, playernames");
@@ -187,7 +208,13 @@ public class Server {
             new Thread(() -> {
                 int relatedIndex = index;
                 System.out.println("in server, listener is set for index, " + relatedIndex);
-                String message = scanners.get(relatedIndex).nextLine();
+                String message;
+                try {
+                    message = scanners.get(relatedIndex).nextLine();
+                }catch (NoSuchElementException e){
+                    System.out.println("----noSuch SERVER 1");
+                    return;
+                }
                 System.out.println("message in server form client no." + relatedIndex + ", " + message);
                 if (message.equals("I Finish This Round")) {
                     new Thread(() -> {
@@ -226,7 +253,13 @@ public class Server {
 
                 for (index = 0; index < scanners.size(); index++) {
                     new Thread(() -> {
-                        String answer = scanners.get(index).nextLine();
+                        String answer;
+                        try {
+                            answer = scanners.get(index).nextLine();
+                        }catch (NoSuchElementException e){
+                            System.out.println("----noSuch SERVER 2");
+                            return;
+                        }
                         answers.add(answer);
                     }).start();
 
@@ -314,9 +347,8 @@ public class Server {
                 sendScoreBoardToClients();
 
 
-                closeCurrentGame();
+                closeSockets();
             }
-
 
         }).start();
 
@@ -325,7 +357,7 @@ public class Server {
     }
 
 
-    private void closeCurrentGame() {
+    public void closeSockets() {
         //disconnect sockets
         for (int i = 0; i < sockets.size(); i++) {
             try {
@@ -334,9 +366,6 @@ public class Server {
                 e.printStackTrace();
             }
         }
-
-        //remove game from database
-        new DatabaseHandler().removeServer(port);
     }
 
 
@@ -384,7 +413,13 @@ public class Server {
                         reactionsOfOnePlayer.add("Positive");
                         continue;
                     }
-                    String reaction = scanners.get(relatedIndex).nextLine();
+                    String reaction;
+                    try {
+                        reaction = scanners.get(relatedIndex).nextLine();
+                    }catch (NoSuchElementException e){
+                        System.out.println("----noSuch SERVER 3");
+                        return;
+                    }
                     System.out.println("reaction of player " + relatedIndex + "to player " + i + " is: " + reaction);
                     reactionsOfOnePlayer.add(reaction);
                 }
@@ -450,7 +485,13 @@ public class Server {
     private void determineAlphabet() {
         //index of player in scanners arraylist who has to determine the alphabet
         int playerIndex = Integer.parseInt(serverPlan.charAt(thisRound - 1) + ""); //because thisRound start from 1
-        String alphabetString = scanners.get(playerIndex).nextLine();
+        String alphabetString;
+        try {
+            alphabetString = scanners.get(playerIndex).nextLine();
+        }catch (NoSuchElementException e){
+            System.out.println("----noSuch SERVER 4");
+            return;
+        }
         char alphabetChar = alphabetString.charAt(0);
         if (!usedAlphabets.contains(alphabetChar)) {
             usedAlphabets.add(alphabetChar);

@@ -151,20 +151,21 @@ public class CreateGameController {
             server = ServerFactory.createServer(fields, hostName, gameName, password, rounds, mode, time);
             server.setCreateGameController(this);
             new Thread( ()-> {
-                server.startGettingClient();
+                server.startAcceptingClient();
             }).start();
-
-
-            //remove created game from database if the window closes
-            Main.mainStage.setOnCloseRequest(windowEvent -> {
-                System.out.println("/////Im closingCreateGame.....");
-                if(server!=null){
-                    databaseHandler.removeServer(server.getPort());
-                }
-            });
 
             System.out.println(fields  + ", gameID = " + server.getPort() + ", hostName: "+ hostName  + ", gameName = " +  gameName  + ", pass: " + password  + ", " + mode  + ", time: " +  time);
 
+        });
+
+        //remove created game from database if the window closes
+        Main.mainStage.setOnCloseRequest(windowEvent -> {
+            System.out.println("/////Im closingCreateGame.....");
+            if(server!=null){
+                databaseHandler.removeServer(server.getPort());
+                server.closeServerSocket();
+                server.closeSockets();
+            }
         });
 
 

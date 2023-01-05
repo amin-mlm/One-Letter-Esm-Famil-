@@ -8,8 +8,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.*;
@@ -28,11 +28,16 @@ public class JoinGameController {
     public AnchorPane rootPane;
 
     @FXML
+    private Label gameStateLabel;
+
+    @FXML
     private MFXLegacyListView<Server> serverListView;
 
     private ObservableList<Server> serversObservableList;
 
     private DatabaseHandler databaseHandler = new DatabaseHandler();
+
+    private int gamePort = -1;
 
     @FXML
     void initialize() {
@@ -50,24 +55,31 @@ public class JoinGameController {
 
     }
 
-    public void joinToServer(int gameId){
+    public void joinToServer(int gamePort){
+        if(this.gamePort!=-1){ //game is already chosen
+            return;
+        }
+        this.gamePort = gamePort;
+
         //if client name was empty add needs
         String clientName = clientNameField.getText();
 
-        sayWelcome(gameId);
+        sayWelcome(gamePort);
 
         Client client = new Client(clientName);
 
         new Thread( ()->{
-            client.joinToServer(gameId);
+            client.setJoinGameController(this);
+            client.joinToServer(gamePort);
             client.waiteForStart();
         }).start();
 
 
     }
 
-    static void sayWelcome(int gameId){
-        System.out.println("welcome to gameid " + gameId);
+    private void sayWelcome(int gameId){
+        gameStateLabel.setText("welcome to gameId " + gameId +
+                "\nwaite for others to join");
         //add needs
     }
 
@@ -104,5 +116,9 @@ public class JoinGameController {
     }
 
 
-
+    public void notifHostLeftGame() {
+        Platform.runLater(()->{
+            gameStateLabel.setText(":(");
+        });
+    }
 }

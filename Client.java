@@ -3,6 +3,7 @@ package com.example.newesmfamil2;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class Client {
@@ -25,7 +26,7 @@ public class Client {
     private int rank;
 
     private GameScreenController gameScreenController;
-
+    private JoinGameController joinGameController;
 
 
     public Client(String name) {
@@ -76,7 +77,13 @@ public class Client {
 
     public void waiteForStart() {
         System.out.println("client listening for plan...");
-        plan = scanner.nextLine();
+        try {
+            plan = scanner.nextLine();
+        }catch (NoSuchElementException e){ //host left the game
+            System.out.println("----noSuch1");
+            joinGameController.notifHostLeftGame();
+            return;
+        }
         numOfAllPlayers = Integer.parseInt(scanner.nextLine());
         indexBetweenAllPlayers = Integer.parseInt(scanner.nextLine());
         System.out.println(plan);
@@ -110,11 +117,24 @@ public class Client {
 
 
     public char listenForAlphabet() {
-        return scanner.nextLine().charAt(0);
+        try{
+            return scanner.nextLine().charAt(0);
+        }catch (NoSuchElementException e){ //host left the game
+            System.out.println("----noSuch2");
+            gameScreenController.notifHostLeftGame();
+            return ' ';
+        }
     }
 
     public String listenToSendAnswerMessage() {
-        String message = scanner.nextLine();
+        String message;
+        try{
+            message = scanner.nextLine();
+        }catch (NoSuchElementException e){ //host left the game
+            System.out.println("----noSuch3");
+            gameScreenController.notifHostLeftGame();
+            return null;
+        }
         System.out.println("message in client, " + message);
         if(message.equals("Send Your Answers")){
             System.out.println("client, I Will Send The Answer Now");
@@ -208,8 +228,16 @@ public class Client {
         return Integer.parseInt(scanner.nextLine());
     }
 
-    public void closeGame() throws IOException {
-        socket.close();
+    public void closeSocket()  {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setJoinGameController(JoinGameController joinGameController) {
+        this.joinGameController = joinGameController;
     }
 }
 
