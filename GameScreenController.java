@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
@@ -99,10 +100,7 @@ public class GameScreenController {
 
         prepareFieldPane();
 
-        if (Integer.parseInt(plan.charAt(thisRound - 1) + "")==1)
-            myTurnToDetermineAlphabet = true;
-        else
-            myTurnToDetermineAlphabet = false;
+        myTurnToDetermineAlphabet = Integer.parseInt(plan.charAt(thisRound - 1) + "") == 1;
 
         if (myTurnToDetermineAlphabet) {   //it can be 0 or 1       because thisRound starts from 1
             System.out.println("TURN ME");
@@ -110,17 +108,16 @@ public class GameScreenController {
         } else {
             System.out.println("NOT TURN ME");
             new Thread(() -> {
-                if(listenForAlphabet()==-1)
+                if(listenForAlphabet()==-1) //host left the game
                     return;
                 startGame();
             }).start();
         }
 
-
         alphabetButton.setOnAction(actionEvent -> {
             new Thread(() -> {
                 if(sendAlphabet()==0){
-                    if(listenForAlphabet()==-1)
+                    if(listenForAlphabet()==-1) //host left the game
                         return;
                     startGame();
                 }
@@ -139,13 +136,13 @@ public class GameScreenController {
         });
 
         newGameButton.setOnAction(actionEvent -> {
-            closeCurrentGame();
+            closeSocket();
             newGame();
         });
 
         exitButton.setOnAction(actionEvent -> {
-            closeCurrentGame();
-            exitButton.getScene().getWindow().hide();
+            closeSocket();
+            Platform.exit();
         });
 
 
@@ -334,15 +331,15 @@ public class GameScreenController {
         scoreBoardListView.setVisible(false);
         scoreBoardListView.setDisable(true);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("com/example/newesmfamil2/gameMode.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameMode.fxml"));
         try {
-            rootPane.getChildren().setAll((Pane)(fxmlLoader.load()));
+            rootPane.getChildren().setAll((Parent)fxmlLoader.load());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void closeCurrentGame() {
+    private void closeSocket() {
         client.closeSocket();
     }
 
