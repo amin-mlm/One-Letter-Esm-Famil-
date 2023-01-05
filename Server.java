@@ -260,8 +260,11 @@ public class Server {
 
 
             }
+            //(15s) see their points +
+            // (1s) server wants to send s.t after
+            // sleep, so clients should be ready for it
             try {
-                Thread.sleep(16000); //1 + 15(see their points)
+                Thread.sleep(16000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

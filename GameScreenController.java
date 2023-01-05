@@ -45,8 +45,8 @@ public class GameScreenController {
     @FXML
     private Label stateLabel;
 
-    @FXML
-    private MFXLegacyTableView<String> resultTable;
+//    @FXML
+//    private MFXLegacyTableView<String> resultTable;
 
 
     private Client client;
@@ -176,7 +176,7 @@ public class GameScreenController {
                     e.printStackTrace();
                 }
 
-                for (int i = 0; i < fieldsString.size(); i++) {
+                for (int i = 0; i < textFields.size(); i++) {
                     System.out.println("will sleep for 10 * " + indexBetweenAllPlayers);
                     try {
                         Thread.sleep((long)10 * indexBetweenAllPlayers);
@@ -192,17 +192,9 @@ public class GameScreenController {
                     String tempAnswer = textFields.get(i).getText();
                     textFields.get(i).setText(tempAnswer + ", " + point);
 
-//                    try {
-//                        Thread.sleep(15000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
                     showTime(15);
 
-
                     // add needs
-
-
                 }
 
                 if (++thisRound <= rounds) {
@@ -210,30 +202,30 @@ public class GameScreenController {
                     prepareNextRound();
                     nextRound();
 
-                }/*else{
+                }else{
 //                    int sumScore = client.listenToSumScore();
 //                    int finalState = client.listenToFinalState();
                     ArrayList<String> names = new ArrayList<>();
                     ArrayList<Integer> scores = new ArrayList<>();
                     for (int i = 0; i < client.getNumOfAllPlayers(); i++) {
-                        names.add(client.listenToClientName());
-                        scores.add(client.listenToClientScore());
+                        names.add(client.listenToClientNameForScoreBoard());
+                        scores.add(client.listenToClientScoreForScoreBoard());
                     }
-                    resultTable = new MFXLegacyTableView<>();
-                    TableColumn nameColumn = new TableColumn("Name");
-                    TableColumn scoreColumn = new TableColumn("Score");
 
-                    resultTable.getColumns().ad
-
-
-                    if(finalState==1){
-                        stateLabel.setText("You Are The CHAMPION !!!" +
-                                "You Got  " + sumScore + "  !");
-                    }else if(finalState==2){
-                        stateLabel.setText("You Got  \" + sumScore + \"  !" +
-                                "You Are the 2'nd ");
-                    }
-                }*/
+//                    resultTable = new MFXLegacyTableView<>();
+//                    TableColumn nameColumn = new TableColumn("Name");
+//                    TableColumn scoreColumn = new TableColumn("Score");
+//
+//                    resultTable.getColumns().add
+//
+//                    if(finalState==1){
+//                        stateLabel.setText("You Are The CHAMPION !!!" +
+//                                "You Got  " + sumScore + "  !");
+//                    }else if(finalState==2){
+//                        stateLabel.setText("You Got  \" + sumScore + \"  !" +
+//                                "You Are the 2'nd ");
+//                    }
+                }
 
 
 
