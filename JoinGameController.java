@@ -43,10 +43,12 @@ public class JoinGameController {
 
     private String gameName;
 
+    private Client client;
+
     @FXML
     void initialize() {
         ArrayList<Server> servers = databaseHandler.showServers();
-        System.out.println("in JoinGameContro: " + servers.size());
+        System.out.println("in JoinGameController: " + servers.size());
         serversObservableList = FXCollections.observableArrayList();
         for(Server server : servers){
             serversObservableList.add(server);
@@ -57,9 +59,16 @@ public class JoinGameController {
 
         refreshButton.setOnAction(actionEvent -> initialize());
 
+        Main.mainStage.setOnCloseRequest(windowEvent -> {
+            System.out.println("/////Im closingJoinGame.....");
+            if(client!=null){
+                client.closeSocket();
+            }
+        });
     }
 
     public void joinToServer(int gamePort, String gameName, boolean isPasswordCorrect){
+        //fxmodify //fxmodify //fxmodify ...
         clientNameField.setStyle("-fx-border-color: ");
 
         if(this.gamePort!=-1){ //game is already chosen
@@ -103,7 +112,7 @@ public class JoinGameController {
         sayWelcome(gameName);
         System.out.println("welcome");
 
-        Client client = new Client(clientNameField.getText());
+        client = new Client(clientNameField.getText());
 
         new Thread( ()->{
             client.setJoinGameController(this);
@@ -115,7 +124,6 @@ public class JoinGameController {
                 Platform.runLater(()->{
                     gameStateLabel.setText(":(\nHost Left The Game, Choose Another Game");
                     clientNameField.setDisable(false);
-                    new Fade(gameStateLabel).fadeIn();
                     initialize();
                 });
             }
@@ -132,36 +140,21 @@ public class JoinGameController {
     }
 
     public void gotoGameScreen(Client client){
-//        new Thread(()->{
-//            Platform.runLater(()->{
-//                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
-//                try {
-//                    Parent root = fxmlLoader.load();
-//                    rootPane.getChildren().setAll(root);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            });
-//
-//        }).start();
-
-//        new Thread(()->{
-            Platform.runLater(()->{
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
-                GameScreenController gameScreenController = new GameScreenController();
-                try {
-                    fxmlLoader.setController(gameScreenController);
-                    gameScreenController.setClient(client);
-                    Parent root = fxmlLoader.load();
-                    rootPane.getChildren().setAll(root);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-//        }).start();
-
-
+        Platform.runLater(()->{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
+            GameScreenController gameScreenController = new GameScreenController();
+            try {
+                gameScreenController.setClient(client);
+                fxmlLoader.setController(gameScreenController);
+                Parent root = fxmlLoader.load();
+                rootPane.getChildren().setAll(root);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
+
+
 
 
 //    public void notifHostLeftGame() {

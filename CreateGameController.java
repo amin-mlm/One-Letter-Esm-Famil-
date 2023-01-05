@@ -117,7 +117,6 @@ public class CreateGameController {
 
     @FXML
     void initialize() {
-
         ToggleGroup gameModeToggle = new ToggleGroup();
         stopy.setToggleGroup(gameModeToggle);
         timey.setToggleGroup(gameModeToggle);
@@ -135,6 +134,7 @@ public class CreateGameController {
 
             errorLabel.setText("");
 
+            //fxmodify
             hostNameField.setStyle("-fx-border-color: ");
             timey.setStyle("-fx-border-color: ");
             stopy.setStyle("-fx-border-color: ");
@@ -152,7 +152,7 @@ public class CreateGameController {
 
             time = 0;
             if(timey.isSelected()){
-                time = (int)timeSlider.getValue() * 60; // add needs //time is set in seconds
+                time = (int)timeSlider.getValue() * 60; //time is set in seconds
                 if(time==0){
                     errorLabel.setText("Determine Game Time");
                     new Fade(errorLabel).fadeIn();
@@ -166,6 +166,7 @@ public class CreateGameController {
                 errorLabel.setText("Choose Game Mode");
                 new Fade(errorLabel).fadeIn();
 
+                //fxmodify
                 timey.setStyle("-fx-border-color: red;");
                 stopy.setStyle("-fx-border-color: red;");
                 new Shaker(timey).shake();
@@ -182,6 +183,7 @@ public class CreateGameController {
                 errorLabel.setText("Insert Only A Number(Integer) For Rounds");
                 new Fade(errorLabel).fadeIn();
 
+                //fxmodify
                 roundsField.setStyle("-fx-border-color: red;");
                 new Shaker(roundsField).shake();
 
@@ -197,6 +199,7 @@ public class CreateGameController {
                     errorLabel.setText("Invalid Game Name(Shouldn't Start With Space)");
                 new Fade(errorLabel).fadeIn();
 
+                //fxmodify
                 gameNameField.setStyle("-fx-border-color: red;");
                 new Shaker(gameNameField).shake();
 
@@ -210,6 +213,7 @@ public class CreateGameController {
                     errorLabel.setText("Invalid Name(Shouldn't Start With Space)");
                 new Fade(errorLabel).fadeIn();
 
+                //fxmodify
                 hostNameField.setStyle("-fx-border-color: red;");
                 new Shaker(hostNameField).shake();
 
@@ -314,7 +318,7 @@ public class CreateGameController {
 
         });
 
-        //remove created game from database if the window closes
+        //remove created game from database if the window is closed
         Main.mainStage.setOnCloseRequest(windowEvent -> {
             System.out.println("/////Im closingCreateGame.....");
             if(server!=null){
@@ -347,24 +351,17 @@ public class CreateGameController {
     }
 
     public void gotoGameScreen(Client client){
-//        new Thread(()->{
-            Platform.runLater(()->{
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
-                GameScreenController controller = new GameScreenController();
-                try {
-                    fxmlLoader.setController(controller);
-                    controller.setClient(client);
-                    Parent root = fxmlLoader.load();
-                    rootPane.getChildren().setAll(root);
-
-        //            ((GameScreenController)fxmlLoader.getController()).setClient(client);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
-            });
-//        }).start();
-
+        Platform.runLater(()->{
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/example/newesmfamil2/gameScreen.fxml"));
+            GameScreenController gameScreenController = new GameScreenController();
+            try {
+                fxmlLoader.setController(gameScreenController);
+                gameScreenController.setClient(client);
+                Parent root = fxmlLoader.load();
+                rootPane.getChildren().setAll(root);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

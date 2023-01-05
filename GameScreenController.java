@@ -196,10 +196,11 @@ public class GameScreenController {
 
 
     private int sendAlphabet() {
-        alphabetField.setStyle("-fx-border-color: ");
+        //fxmodify...
+//        alphabetField.setStyle("-fx-border-color: ");
 
         String alphabetString = alphabetField.getText();
-        char alphabetChar = alphabetString.charAt(0);
+        char alphabetChar;
 
         if (alphabetString.length() != 1) {
             alphabetField.setStyle("-fx-border-color: red");
@@ -210,6 +211,9 @@ public class GameScreenController {
             new Shaker(alphabetField).shake();
 
             return -1; //code for invalid alphabet error
+        }
+        else{
+            alphabetChar = alphabetString.charAt(0);
         }
         if (!((alphabetChar >= 65 && alphabetChar <= 90) || (alphabetChar >= 97 && alphabetChar <= 122))) {
             alphabetField.setStyle("-fx-border-color: red");
@@ -304,7 +308,7 @@ public class GameScreenController {
                 if (++thisRound <= rounds) {
 
                     int result = prepareNextRound();
-                    if(result==-1)
+                    if(result==-1) //host left game
                         return;
 
                     nextRound();
@@ -715,8 +719,8 @@ public class GameScreenController {
         timeLabel.setVisible(false);
         timeLabel.setDisable(true);
 
-        alphabetLabel.setVisible(false);
-        alphabetLabel.setDisable(true);
+        alphabetField.setVisible(false);
+        alphabetField.setDisable(true);
 
         alphabetButton.setVisible(false);
         alphabetButton.setDisable(true);

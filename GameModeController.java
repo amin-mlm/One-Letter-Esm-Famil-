@@ -3,6 +3,8 @@ package com.example.newesmfamil2;
 import io.github.palexdev.materialfx.controls.MFXButton;
 
 import java.io.IOException;
+
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.image.Image;
@@ -70,7 +72,7 @@ public class GameModeController {
         });
 
         exitButton.setOnAction(actionEvent -> {
-            exitButton.getScene().getWindow().hide();
+            Platform.exit();
         });
 
 

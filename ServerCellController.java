@@ -3,7 +3,6 @@ package com.example.newesmfamil2;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXPasswordField;
 import io.github.palexdev.materialfx.controls.legacy.MFXLegacyListCell;
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
@@ -18,9 +17,6 @@ public class ServerCellController extends MFXLegacyListCell<Server> {
 
     @FXML
     private Label hostLabel;
-
-//    @FXML
-//    private Label idLabel;
 
     @FXML
     private MFXPasswordField passField;
@@ -55,19 +51,13 @@ public class ServerCellController extends MFXLegacyListCell<Server> {
                 }
             }
 
-//            idLabel.setText("port: " + item.getPort());
             gameNameLabel.setText(item.getGameName());
             hostLabel.setText(item.getHostName());
             roundsLabel.setText(item.getRounds()+"");
 
             startButton.setOnAction(actionEvent ->{
                 if(passField.getText().equals(item.getPassword())){
-//                    new Thread(()->{
-//                        Platform.runLater(()->{
                     ((JoinGameController)GameModeController.fxmlLoader.getController()).joinToServer(item.getPort(), item.getGameName(), true);
-//                        });
-//                    }).start();
-//                    JoinGameController.waiteToStartGame(item.getId());
                 }
                 else{
                     ((JoinGameController)GameModeController.fxmlLoader.getController()).joinToServer(item.getPort(), item.getGameName(), false);

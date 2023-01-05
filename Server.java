@@ -76,7 +76,7 @@ public class Server {
             try {
                 try{
                     socket = serverSocket.accept();
-                }catch (SocketException e){ //if the player closes the window, serverSocket.accept() throws exception
+                }catch (SocketException e){ //if the host closes the window, serverSocket.accept() throws exception
                     System.out.println("exception passed");
                     return;
                 }
@@ -102,7 +102,6 @@ public class Server {
             String playerName = exchangeInfo(scanner, printwriter, numPlayers - 1);
 
             createGameController.addPlayerToBoard(playerName);
-
         }
 
         //remove game from database
@@ -188,7 +187,7 @@ public class Server {
             }
             printWriters.get(i).println(clientPlan); //send plan
             printWriters.get(i).println(numPlayers + ""); //send numPlayers
-            printWriters.get(i).println(i + ""); //send index between all clients
+            printWriters.get(i).println(i + ""); //send index between all players
 
         }
 
@@ -213,7 +212,8 @@ public class Server {
                 try {
                     message = scanners.get(relatedIndex).nextLine();
                 }catch (NoSuchElementException e){
-                    System.out.println("----noSuch SERVER 2(finish message)");
+                    System.out.println("----noSuch SERVER 2(finish message) relatedIndex = " + relatedIndex);
+                    closeSockets();
                     return;
                 }
                 System.out.println("message in server form client no." + relatedIndex + ", " + message);
@@ -262,6 +262,7 @@ public class Server {
                         }catch (NoSuchElementException e){
                             System.out.println("----noSuch SERVER 3(answer)");
                             hostLeftGame = true;
+                            closeSockets();
                             return;
                         }
                         answers.add(answer);
@@ -421,6 +422,7 @@ public class Server {
                     }catch (NoSuchElementException e){
                         System.out.println("----noSuch SERVER 4(reaction)");
                         hostLeftGame = true;
+                        closeSockets();
                         return;
                     }
                     System.out.println("reaction of player " + relatedIndex + "to player " + i + " is: " + reaction);
@@ -500,6 +502,7 @@ public class Server {
             alphabetString = scanners.get(playerIndex).nextLine();
         }catch (NoSuchElementException e){
             System.out.println("----noSuch SERVER 1(alphabet)");
+            closeSockets();
             return;
         }
         char alphabetChar = alphabetString.charAt(0);

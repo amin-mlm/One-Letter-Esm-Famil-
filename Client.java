@@ -1,9 +1,6 @@
 package com.example.newesmfamil2;
 
-import javafx.stage.Stage;
-
 import java.io.*;
-import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -90,7 +87,6 @@ public class Client {
             plan = scanner.nextLine();
         }catch (NoSuchElementException e){ //host left the game
             System.out.println("----noSuch 1(plan)");
-//            joinGameController.notifHostLeftGame();
             return -1;
         }
         numOfAllPlayers = Integer.parseInt(scanner.nextLine());
@@ -119,8 +115,9 @@ public class Client {
     public int sendAlphabet(String alphabetChar) {
         printWriter.println(alphabetChar);
         try{
-            return Integer.parseInt(scanner.nextLine());
+            return Integer.parseInt(scanner.nextLine()); //result of entered alphabet
         }catch (NoSuchElementException e){
+            System.out.println("----noSuch 2(alphabet-turn me)");
             gameScreenController.notifHostLeftGame();
             return -2;
         }
@@ -135,7 +132,7 @@ public class Client {
         try{
             return scanner.nextLine().charAt(0);
         }catch (NoSuchElementException e){ //host left the game
-            System.out.println("----noSuch 2(alphabet)");
+            System.out.println("----noSuch 2(alphabet-not turn me)");
             gameScreenController.notifHostLeftGame();
             return ' ';
         }

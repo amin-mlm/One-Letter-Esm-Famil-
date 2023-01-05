@@ -8,7 +8,6 @@ public class ServerFactory {
     static int FIRST_PORT = 8080;
     static String MAIN_HOST = "localhost";
 
-    static ArrayList<Server> servers = new ArrayList<>();
     static DatabaseHandler databaseHandler = new DatabaseHandler();
 
     public static Server createServer(ArrayList<String> fields, String hostName, String gameName, String password, int rounds, String mode, int time) {
@@ -17,7 +16,6 @@ public class ServerFactory {
         try {
             gamePort = databaseHandler.createServer(password, gameName, hostName, rounds, mode, time);
         } catch (SQLException e) {
-            // add needs
             e.printStackTrace();
         }
 
