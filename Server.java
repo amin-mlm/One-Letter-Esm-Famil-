@@ -93,12 +93,10 @@ public class Server {
     }
 
     private void exchangeInfo(Scanner scanner, PrintWriter printWriter, int indexBetweenAllPlayers) {
-
         String name = scanner.nextLine();
         clientsName.add(name);
 
         System.out.println("client: new client: " + name);
-
 
         printWriter.println(numFields);
         for (String s : fields)
@@ -106,7 +104,6 @@ public class Server {
         printWriter.println(gameMode);
         printWriter.println(rounds);
         printWriter.println(time);
-
     }
 
 
@@ -135,8 +132,8 @@ public class Server {
 
         //set plan for server to get alphabet from clients
         //for instance,plan: 0123012 means client index 0 (in scanners list) should
-        //determine the game alphabet in the first game,
-        //client index 1 should determine in the second game and so on.
+        //determine the game alphabet in the first round,
+        //client index 1 should determine in the second round and so on.
         int numPlayers = sockets.size();
         serverPlan = "";
         for (int i = 0; i < rounds; i++) {

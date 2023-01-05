@@ -61,7 +61,7 @@ public class GameScreenController {
 
     private String gameMode;
 
-    private int time;
+    private int time; //in second
 
     private int indexBetweenAllPlayers;
 
@@ -75,6 +75,8 @@ public class GameScreenController {
 
     private int index;
 
+    private boolean myTurnToDetermineAlphabet;
+
 
     @FXML
     void initialize() {
@@ -82,8 +84,12 @@ public class GameScreenController {
 
         prepareFieldPane();
 
+        if (Integer.parseInt(plan.charAt(thisRound - 1) + "")==1)
+            myTurnToDetermineAlphabet = true;
+        else
+            myTurnToDetermineAlphabet = false;
 
-        if (Integer.parseInt(plan.charAt(thisRound - 1) + "") == 1) {   //it can be 0 or 1       because thisRound starts from 1
+        if (myTurnToDetermineAlphabet) {   //it can be 0 or 1       because thisRound starts from 1
             System.out.println("TURN ME");
             alphabetField.setDisable(false);
             alphabetField.setVisible(true);
@@ -199,7 +205,7 @@ public class GameScreenController {
 
                 }
 
-                if(++thisRound<=rounds){
+                if (++thisRound <= rounds) {
 
                     prepareNextRound();
                     nextRound();
@@ -239,18 +245,18 @@ public class GameScreenController {
         if (gameMode.equals("Game Is Finished When The Time Is Over")) {
             System.out.println("game is timeyy");
 
-            showTime(time * 60);
+            showTime(/*time*/30);
 
             System.out.println("time finished");
 
-            client.sendFinishState();
+            if(myTurnToDetermineAlphabet)
+                client.sendFinishState();
 
 
         } else if (gameMode.equals("Game Is Finished When A Player Finished")) {
             System.out.println("game is stopyy");
             finishButton.setVisible(true);
             finishButton.setDisable(false);
-
 
         }
     }
