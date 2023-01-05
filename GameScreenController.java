@@ -132,6 +132,8 @@ public class GameScreenController {
                    }
                });
 
+               //sleep here, instead of in server
+
                for (int i = 0; i < fieldsString.size(); i++) {
                    int point = client.sendAnswerAndGetPoint(textFields.get(i).getText());
                    String tempAnswer = textFields.get(i).getText();

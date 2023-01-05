@@ -163,20 +163,21 @@ public class Server {
         for (index = 0; index < scanners.size(); index++) {
             new Thread(() -> {
                 int relatedIndex = index;
-                String message = scanners.get(index).nextLine();
+                System.out.println("in server, listener is set for index, " +  relatedIndex);
+                String message = scanners.get(relatedIndex).nextLine();
                 System.out.println("message in server form client no." + relatedIndex + ", " + message);
                 if (message.equals("I Finish This Round")) {
                     new Thread(()->{
                         scanners.get(relatedIndex).nextLine();
                     }).start();
                     //nothing
-                    CollectAndCheckAnswers(index);
+                    CollectAndCheckAnswers(relatedIndex);
                 } else if (message.equals("I Will Send The Answer Now")) {
                     //nothing
                 }
             }).start();
             try {
-                Thread.sleep(200);
+                Thread.sleep(20);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -189,8 +190,8 @@ public class Server {
 
             new Thread(() -> {
                 //get 1 field answer from all clients and
-                // send back the points they gave for this field
-                // and then go for next field and so on
+                // send back the points they are given for this
+                // field and then go for next field and so on
                 for (int i = 0; i < numFields; i++) {
                     ArrayList<String> answers = new ArrayList<>();
                     ArrayList<Integer> points = new ArrayList<>();
@@ -202,7 +203,7 @@ public class Server {
                         }).start();
 
                         try {
-                            Thread.sleep(200);
+                            Thread.sleep(200); //can be 20? yes 99%
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -226,6 +227,7 @@ public class Server {
     }
 
     private void determineAlphabet() {
+        //index of player in scanners arraylist who has to determine the alphabet
         int playerIndex = Integer.parseInt(serverPlan.charAt(thisRound - 1) + ""); //because thisRound start from 1
         String alphabetString = scanners.get(playerIndex).nextLine();
         char alphabetChar = alphabetString.charAt(0);
@@ -234,7 +236,7 @@ public class Server {
             printWriters.get(playerIndex).println(0 + ""); //code for no problem
 
             try {
-                Thread.sleep(200); // can be omitted? yes 99%
+                Thread.sleep(200); // can be omitted? yes 99% actually 200 is high
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -254,9 +256,17 @@ public class Server {
     }
 
     private ArrayList<Integer> calculatePoints(ArrayList<String> answers, String category) {
+        int n = answers.size();
         ArrayList<Integer> points = new ArrayList<>();
-        for (int i = 0; i < answers.size(); i++) {
-            points.add(5);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if(i!=j && answers.get(i).equals(answers.get(j))){
+                    points.add(5);
+                    break;
+                }
+                if(j==n-1)
+                    points.add(10);
+            }
         }
 
         return points;
