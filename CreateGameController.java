@@ -173,9 +173,19 @@ public class CreateGameController {
             }else
                 mode = ((RadioButton)gameModeToggle.getSelectedToggle()).getText();
 
-            rounds = 0;
+//            rounds = 0;
             try{
                 rounds = Integer.parseInt(roundsField.getText());
+                if(rounds==0){
+                    errorLabel.setText("Rounds Cannot Be 0");
+                    new Fade(errorLabel).fadeIn();
+
+                    //fxmodify
+                    roundsField.setStyle("-fx-border-color: red;");
+                    new Shaker(roundsField).shake();
+
+                    actionEvent.consume();
+                }
             }catch(NumberFormatException e){
                 errorLabel.setText("Insert Only A Number(Integer) For Rounds");
                 new Fade(errorLabel).fadeIn();

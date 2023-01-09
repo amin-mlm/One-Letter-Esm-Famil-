@@ -72,7 +72,7 @@ public class JoinGameController {
         clientNameField.setStyle("-fx-border-color: ");
 
         if(this.gamePort!=-1){ //game is already chosen
-            gameStateLabel.setText("You Have Entered To " + this.gameName + "'s Game" +
+            gameStateLabel.setText("You Have Already Entered To " + this.gameName + "'s Game" +
                     "\nwait for others to join...");
             new Fade(gameStateLabel).fadeIn();
 
@@ -122,7 +122,7 @@ public class JoinGameController {
                 client.closeSocket();
 
                 Platform.runLater(()->{
-                    gameStateLabel.setText(":(\nHost Left The Game, Choose Another Game");
+                    gameStateLabel.setText(":(\nHost Left The Game\nChoose Another Game");
                     clientNameField.setDisable(false);
                     initialize();
                 });

@@ -123,11 +123,6 @@ public class Client {
         }
     }
 
-
-
-
-
-
     public char listenForAlphabet() {
         try{
             return scanner.nextLine().charAt(0);

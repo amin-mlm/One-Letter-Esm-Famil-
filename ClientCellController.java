@@ -26,6 +26,15 @@ public class ClientCellController extends MFXLegacyListCell<Client> {
     @FXML
     private ImageView userImage;
 
+    @FXML
+    private ImageView rank1Image;
+
+    @FXML
+    private ImageView rank2Image;
+
+    @FXML
+    private ImageView rank3Image;
+
     FXMLLoader fxmlLoader;
 
     @Override
@@ -47,24 +56,27 @@ public class ClientCellController extends MFXLegacyListCell<Client> {
             }
             switch (item.getRank()) {
                 case 1 -> {
-                    BackgroundFill myBF1 = new BackgroundFill(Color.GOLD, new CornerRadii(1),
-                            new Insets(0));// or null for the padding
-                    rootPane.setBackground(new Background(myBF1));
+                    rank1Image.setVisible(true);
+//                    BackgroundFill myBF1 = new BackgroundFill(Color.GOLD, new CornerRadii(1),
+//                            new Insets(0));// or null for the padding
+//                    rootPane.setBackground(new Background(myBF1));
                 }
                 case 2 -> {
-                    BackgroundFill myBF2 = new BackgroundFill(Color.SILVER, new CornerRadii(1),
-                            new Insets(0.0, 0.0, 0.0, 0.0));// or null for the padding
-                    rootPane.setBackground(new Background(myBF2));
+                    rank2Image.setVisible(true);
+//                    BackgroundFill myBF2 = new BackgroundFill(Color.SILVER, new CornerRadii(1),
+//                            new Insets(0.0, 0.0, 0.0, 0.0));// or null for the padding
+//                    rootPane.setBackground(new Background(myBF2));
                 }
                 case 3 -> {
-                    BackgroundFill myBF3 = new BackgroundFill(Color.ORANGERED, new CornerRadii(1),
-                            new Insets(0.0, 0.0, 0.0, 0.0));// or null for the padding
-                    rootPane.setBackground(new Background(myBF3));
+                    rank3Image.setVisible(true);
+//                    BackgroundFill myBF3 = new BackgroundFill(Color.ORANGERED, new CornerRadii(1),
+//                            new Insets(0.0, 0.0, 0.0, 0.0));// or null for the padding
+//                    rootPane.setBackground(new Background(myBF3));
                 }
                 default -> {
-                    BackgroundFill myBF0 = new BackgroundFill(Color.LIGHTGREEN, new CornerRadii(1),
-                            new Insets(0.0, 0.0, 0.0, 0.0));// or null for the padding
-                    rootPane.setBackground(new Background(myBF0));
+//                    BackgroundFill myBF0 = new BackgroundFill(Color.LIGHTGREEN, new CornerRadii(1),
+//                            new Insets(0.0, 0.0, 0.0, 0.0));// or null for the padding
+//                    rootPane.setBackground(new Background(myBF0));
                 }
 
 //                case 1: BackgroundImage myBI1= new BackgroundImage(new Image("C:\\Users\\USER\\Desktop\\java desktop\\esmFamilAll\\newEsmFamil2\\src\\main\\resources\\com\\example\\newesmfamil2\\assets\\no1.jpg",400,95,false,true),

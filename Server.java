@@ -151,7 +151,7 @@ public class Server {
             clientsThisRoundPoints.add(0);
         }
 
-        //bring host from last to first of arrayLists
+        //bring host from last to first index of arrayLists
         sockets.add(0, sockets.get(sockets.size() - 1));
         sockets.remove(sockets.size() - 1);
 
@@ -174,9 +174,9 @@ public class Server {
             serverPlan += i % numPlayers;
         }
 
-        //set and send the plan for determining alphabets via clients
+        //set and send plan for determining alphabets via clients
         //for instance,plan: 0100010 means this client should determine the
-        //game alphabet in the second and sixth game.
+        //game alphabet in the second and sixth round.
         for (int i = 0; i < numPlayers; i++) {
             String clientPlan = "";
             for (int j = 0; j < rounds; j++) {
@@ -222,11 +222,12 @@ public class Server {
                         System.out.println("relatedIndex of finisher: " + relatedIndex);
                         scanners.get(relatedIndex).nextLine();
                     }).start();
-                    try {
-                        Thread.sleep(500); //was 20
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        Thread.sleep(500); //was 20
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+
                     //nothing
 
                     collectAndCheckAnswers(relatedIndex);
@@ -236,7 +237,7 @@ public class Server {
                 }
             }).start();
             try {
-                Thread.sleep(70); //was 20
+                Thread.sleep(100); //100 fixed
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -256,9 +257,12 @@ public class Server {
 
                 for (index = 0; index < scanners.size(); index++) {
                     new Thread(() -> {
+                        int relatedIndex = index;
                         String answer;
                         try {
-                            answer = scanners.get(index).nextLine();
+                            System.out.println("AOOOOOOOOOOOOOOOOOOO " + relatedIndex);
+                            answer = scanners.get(relatedIndex).nextLine();
+                            System.out.println("BOOOOOOOOOOOOOOOOOOO " + relatedIndex);
                         }catch (NoSuchElementException e){
                             System.out.println("----noSuch SERVER 3(answer)");
                             hostLeftGame = true;
@@ -269,21 +273,21 @@ public class Server {
                     }).start();
 
                     try {
-                        Thread.sleep(50); //can be 1? yes 99%++
+                        Thread.sleep(100); // 100 fixed
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
                 while (answers.size() != scanners.size()) {
                     try {
-                        Thread.sleep(200);
+                        Thread.sleep(200); //check the answers for amount every 200 millis
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     
-                    if (hostLeftGame)
+                    if (hostLeftGame){
                         return;
-                    
+                    }
                 }
                 System.out.println("server, checking answers: " + answers);
 
@@ -399,7 +403,7 @@ public class Server {
         for (index = 0; index < numPlayers; index++) {
             ArrayList<String> reactionsOfOnePlayer = new ArrayList<>();
 
-            //send other answers of players to them
+            //send "other answers" of players to them
             for (int i = 0; i < numPlayers; i++) {
                 if (index == i) //no need to send one's answer to oneself
                     continue;
@@ -414,19 +418,20 @@ public class Server {
                 for (int i = 0; i < numPlayers; i++) {
                     if (i == relatedIndex) {
                         reactionsOfOnePlayer.add("Positive");
-                        continue;
                     }
-                    String reaction;
-                    try {
-                        reaction = scanners.get(relatedIndex).nextLine();
-                    }catch (NoSuchElementException e){
-                        System.out.println("----noSuch SERVER 4(reaction)");
-                        hostLeftGame = true;
-                        closeSockets();
-                        return;
+                    else{
+                        String reaction;
+                        try {
+                            reaction = scanners.get(relatedIndex).nextLine();
+                        }catch (NoSuchElementException e){
+                            System.out.println("----noSuch SERVER 4(reaction)");
+                            hostLeftGame = true;
+                            closeSockets();
+                            return;
+                        }
+                        System.out.println("reaction of player " + relatedIndex + "to player " + i + " is: " + reaction);
+                        reactionsOfOnePlayer.add(reaction);
                     }
-                    System.out.println("reaction of player " + relatedIndex + "to player " + i + " is: " + reaction);
-                    reactionsOfOnePlayer.add(reaction);
                 }
                 System.out.println("---omran ino bbini");
                 allReactions.add(reactionsOfOnePlayer);
@@ -455,6 +460,7 @@ public class Server {
         }
 
         System.out.println("all reactions: " + allReactions);
+        //count pos and neg reactions
         ArrayList<String> filteredAnswers = new ArrayList<>();
         for (int i = 0; i < numPlayers; i++) {
             int positiveReactions = 0;
@@ -495,7 +501,7 @@ public class Server {
 
 
     private void determineAlphabet() {
-        //index of player in scanners arraylist who has to determine the alphabet
+        //index of player in scanners arraylist who has to determine the game alphabet
         int playerIndex = Integer.parseInt(serverPlan.charAt(thisRound - 1) + ""); //because thisRound start from 1
         String alphabetString;
         try {

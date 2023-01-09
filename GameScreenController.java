@@ -17,13 +17,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 
@@ -103,16 +107,14 @@ public class GameScreenController {
 
     @FXML
     void initialize() {
-
-
         prepareFieldPane();
         Platform.runLater(()->{
             roundLabel.setText("Round " + thisRound + "/" + rounds);
         });
 
-        myTurnToDetermineAlphabet = Integer.parseInt(plan.charAt(thisRound - 1) + "") == 1;
+        myTurnToDetermineAlphabet = Integer.parseInt(plan.charAt(thisRound - 1) + "") == 1; //because thisRound starts from 1
 
-        if (myTurnToDetermineAlphabet) {   //it can be 0 or 1       because thisRound starts from 1
+        if (myTurnToDetermineAlphabet) {   //it can be either 0 or 1
             System.out.println("TURN ME");
             prepareToDetermineAlphabet();
         } else {
@@ -209,6 +211,7 @@ public class GameScreenController {
                 alphabetField.setPromptText("Only 1 letter");
             });
             new Shaker(alphabetField).shake();
+            new Shaker(alphabetButton).shake();
 
             return -1; //code for invalid alphabet error
         }
@@ -272,11 +275,11 @@ public class GameScreenController {
                 }
 
                 for (int i = 0; i < textFields.size(); i++) {
-                    System.out.println("will sleep for 10 * " + indexBetweenAllPlayers);
+                    System.out.println("will sleep for 100 * " + (indexBetweenAllPlayers + 1));
 
                     //sleep to avoid sync data with other players
                     try {
-                        Thread.sleep((long)10 * indexBetweenAllPlayers);
+                        Thread.sleep((long)100 * (indexBetweenAllPlayers + 1));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -302,7 +305,7 @@ public class GameScreenController {
                     String tempAnswer = textFields.get(i).getText();
                     textFields.get(i).setText(tempAnswer + ", " + point);
 
-                    showTime(10); //if this time changes, sleep in server before sending roundScore should be updated to (time + 1)
+                    showTime(10); //if time is changed, "sleep in server" before "sending roundScore" should be updated to (time + 1)
                 }
 
                 if (++thisRound <= rounds) {
@@ -377,7 +380,7 @@ public class GameScreenController {
         if (gameMode.equals("Game Is Finished When The Time Is Over")) {
             System.out.println("game is timeyy");
 
-            showTime(/*time*/10);
+            showTime(time/*10*/);
 
             System.out.println("time finished");
 
@@ -490,7 +493,7 @@ public class GameScreenController {
         reactionPane.setDisable(false);
 
         Platform.runLater(()->{
-            alphabetLabel.setText("Do You Consider These Answers To Be As A \"" + category + "\"" + " ?(Must Starts With " + alphabet + " )" +
+            alphabetLabel.setText("Do You Consider These Answers To Be A \"" + category + "\"" + " ?(Must Starts With " + alphabet + " )" +
                 "\n(If None Is Chosen, \"Yes\" Will Be Automatically Ticked)");
         });
 
@@ -539,7 +542,7 @@ public class GameScreenController {
             });
         }
 
-        showTime(7 * othersAnswers.size()/* + 10*/ /*add needs (just delete this)*/);
+        showTime(5 * othersAnswers.size());
 
 //        if(client.getSocket().isInputShutdown()){ //is socket closed from server side? (or did host leave game)
 //            System.out.println("gameScreen returned");
@@ -552,16 +555,13 @@ public class GameScreenController {
         for (int i=0; i < othersAnswers.size(); i++) {
             if(othersAnswers.get(i).equals("") || !(othersAnswers.get(i).charAt(0)+"").equalsIgnoreCase(alphabet+"")) {
                 reactions.add("Negative");
-//                System.out.println("    for answer " + othersAnswers.get(i) + ", empty negative");
+                System.out.println("--HM1 in i = " + i);
                 continue;
             }else if(similarAnswers[i]!=-1){
                 reactions.add(reactions.get(similarAnswers[i]));
-//                System.out.println("    for answer " + othersAnswers.get(i) + ", similar ot i " + similarAnswers[i]);
+                System.out.println("--HM2 in i = " + i);
                 continue;
             }
-
-
-//            System.out.println("    for answer " + othersAnswers.get(i) + ", vbox");
 
 
             radioButtonsNo.get(index).setDisable(true);
@@ -569,15 +569,15 @@ public class GameScreenController {
 
             if(toggleGroups.get(index).getSelectedToggle()==null){
                 Platform.runLater(()->{
+                    System.out.println("--HM3 in i = " + index);
                     toggleGroups.get(index).selectToggle(radioButtonsYes.get(index));
                 });
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            System.out.println("--gameScreen if");
 
             try{
                 if(toggleGroups.get(index).getSelectedToggle().equals(radioButtonsYes.get(index))){
@@ -603,8 +603,9 @@ public class GameScreenController {
         reactionPane.setVisible(false);
         reactionPane.setDisable(true);
 
+        System.out.println("888 reactions.size() + " + reactions.size());
         try {
-            Thread.sleep(10 * indexBetweenAllPlayers);
+            Thread.sleep((long) 10 * indexBetweenAllPlayers);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -688,6 +689,9 @@ public class GameScreenController {
         if(thisRound==1){
             for (String s : fieldsString) {
                 MFXTextField textField = new MFXTextField();
+                textField.setStyle("-fx-text-fill: #0e454b; -fx-font-size: 30xpx; -fx-font-style: Bold Italic;");
+                textField.setBackground(new Background(new BackgroundFill(Paint.valueOf("#a1cdd1"), CornerRadii.EMPTY, Insets.EMPTY)));
+                textField.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
                 textField.setDisable(true);
                 textField.setFloatingText(s);
                 textField.setPrefHeight(60);
