@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXCheckbox?>
+<?import io.github.palexdev.materialfx.controls.MFXRadioButton?>
+<?import io.github.palexdev.materialfx.controls.MFXSlider?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import io.github.palexdev.materialfx.controls.legacy.MFXLegacyTableView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" prefHeight="555.0" prefWidth="934.0" style="-fx-background-color: #D5F5E3;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.newesmfamil2.CreateGameController">
+    <children>
+        <MFXTextField fx:id="hostNameField" floatingText="Your Name" layoutX="640.0" layoutY="66.0" prefHeight="31.0" prefWidth="219.0">
+         <textFill>
+            <Color red="0.054901961237192154" green="0.2705882489681244" blue="0.29411765933036804" opacity="0.8700000047683716" />
+         </textFill>
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow height="2.28" radius="1.81" width="6.96" />
+         </effect></MFXTextField>
+        <MFXTextField fx:id="gameNameField" floatingText="Game Name" layoutX="640.0" layoutY="133.0" prefHeight="31.0" prefWidth="219.0">
+         <textFill>
+            <Color red="0.054901961237192154" green="0.2705882489681244" blue="0.29411765933036804" opacity="0.8700000047683716" />
+         </textFill>
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow height="2.28" radius="1.81" width="6.96" />
+         </effect></MFXTextField>
+        <MFXTextField fx:id="passwordField" floatingText="Password" layoutX="640.0" layoutY="203.0" prefHeight="31.0" prefWidth="219.0">
+         <textFill>
+            <Color red="0.054901961237192154" green="0.2705882489681244" blue="0.29411765933036804" opacity="0.8700000047683716" />
+         </textFill>
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow height="2.28" radius="1.81" width="6.96" />
+         </effect></MFXTextField>
+        <MFXTextField fx:id="roundsField" floatingText="Rounds" layoutX="640.0" layoutY="273.0" prefHeight="31.0" prefWidth="219.0">
+         <textFill>
+            <Color red="0.054901961237192154" green="0.2705882489681244" blue="0.29411765933036804" opacity="0.8700000047683716" />
+         </textFill>
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font>
+         <effect>
+            <DropShadow height="2.28" radius="1.81" width="6.96" />
+         </effect></MFXTextField>
+        <MFXRadioButton fx:id="stopy" layoutX="641.0" layoutY="357.0" text="Game Is Finished When A Player Finishes" textFill="#111446">
+         <effect>
+            <Blend />
+         </effect>
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></MFXRadioButton>
+        <MFXRadioButton fx:id="timey" layoutX="640.0" layoutY="402.0" text="Game Is Finished When The Time Is Over" textFill="#111446">
+         <effect>
+            <Blend />
+         </effect>
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></MFXRadioButton>
+        <MFXSlider fx:id="timeSlider" disable="true" layoutX="648.0" layoutY="457.0" max="90.0" min="1.0" prefHeight="106.0" prefWidth="219.0" />
+        <MFXCheckbox fx:id="firstnameCheck" contentDisposition="RIGHT" gap="6.0" layoutX="271.0" layoutY="48.0" text="Firstname" textFill="#111446">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+         <effect>
+            <Blend mode="SCREEN" />
+         </effect></MFXCheckbox>
+        <MFXCheckbox fx:id="lastnameCheck" contentDisposition="RIGHT" gap="6.0" layoutX="427.0" layoutY="48.0" text="Lastname" textFill="#111446">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+         <effect>
+            <Blend mode="SCREEN" />
+         </effect></MFXCheckbox>
+        <MFXCheckbox fx:id="cityCheck" contentDisposition="RIGHT" gap="6.0" layoutX="274.0" layoutY="98.0" text="City" textFill="#111446">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+         <effect>
+            <Blend mode="SCREEN" />
+         </effect>
+      </MFXCheckbox>
+        <MFXCheckbox fx:id="countryCheck" contentDisposition="RIGHT" gap="6.0" layoutX="372.0" layoutY="98.0" text="Country" textFill="#111446">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+         <effect>
+            <Blend mode="SCREEN" />
+         </effect></MFXCheckbox>
+        <MFXCheckbox fx:id="foodCheck" contentDisposition="RIGHT" gap="6.0" layoutX="490.0" layoutY="105.0" text="Food" textFill="#111446">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+         <effect>
+            <Blend mode="SCREEN" />
+         </effect></MFXCheckbox>
+        <MFXCheckbox fx:id="animalCheck" contentDisposition="RIGHT" gap="6.0" layoutX="342.0" layoutY="144.0" text="Animal" textFill="#111446">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+         <effect>
+            <Blend mode="SCREEN" />
+         </effect></MFXCheckbox>
+        <MFXCheckbox fx:id="carCheck" contentDisposition="RIGHT" gap="6.0" layoutX="264.0" layoutY="175.0" text="Car" textFill="#111446">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+         <effect>
+            <Blend mode="SCREEN" />
+         </effect></MFXCheckbox>
+        <MFXCheckbox fx:id="fruitCheck" contentDisposition="RIGHT" gap="6.0" layoutX="393.0" layoutY="189.0" text="Fruit" textFill="#111446">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+         <effect>
+            <Blend mode="SCREEN" />
+         </effect></MFXCheckbox>
+        <MFXCheckbox fx:id="clothsCheck" contentDisposition="RIGHT" gap="6.0" layoutX="500.0" layoutY="169.0" text="Cloths" textFill="#111446">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+         <effect>
+            <Blend mode="SCREEN" />
+         </effect></MFXCheckbox>
+        <MFXCheckbox fx:id="inanimateCheck" contentDisposition="RIGHT" gap="6.0" layoutX="454.0" layoutY="225.0" text="Inanimate" textFill="#111446">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+         <effect>
+            <Blend mode="SCREEN" />
+         </effect></MFXCheckbox>
+        <MFXCheckbox fx:id="flowerCheck" contentDisposition="RIGHT" gap="6.0" layoutX="321.0" layoutY="239.0" text="Flower" textFill="#111446">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+         <effect>
+            <Blend mode="SCREEN" />
+         </effect></MFXCheckbox>
+      <MFXButton fx:id="createGameButton" depthLevel="LEVEL0" layoutX="83.0" layoutY="359.0" prefHeight="50.0" prefWidth="444.0" rippleAnimationSpeed="2.0" rippleColor="BLACK" style="-fx-background-color: #1515;" text="Create Game" textFill="#0e454b">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font></MFXButton>
+      <MFXButton fx:id="startGameButton" layoutX="83.0" layoutY="424.0" prefHeight="50.0" prefWidth="444.0" rippleAnimationSpeed="2.0" rippleColor="BLACK" style="-fx-background-color: #6288E6;" text="Start Game" textFill="#0e454b">
+         <font>
+            <Font name="System Bold Italic" size="25.0" />
+         </font></MFXButton>
+      <MFXLegacyTableView fx:id="playerNameTableView" disable="true" layoutX="33.0" layoutY="27.0" prefHeight="310.0" prefWidth="200.0" style="-fx-background-color: #1515;">
+         <effect>
+            <DropShadow />
+         </effect></MFXLegacyTableView>
+      <Label fx:id="errorLabel" alignment="BOTTOM_CENTER" layoutX="133.0" layoutY="487.0" prefHeight="68.0" prefWidth="678.0" textAlignment="CENTER" textFill="#dc6262">
+         <font>
+            <Font name="System Bold Italic" size="20.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>

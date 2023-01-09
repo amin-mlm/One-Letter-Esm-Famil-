@@ -84,7 +84,7 @@ public class GameScreenController {
 
     private String gameMode;
 
-    private int time; //in second
+    private int time;
 
     private int indexBetweenAllPlayers;
 
@@ -305,6 +305,9 @@ public class GameScreenController {
                     String tempAnswer = textFields.get(i).getText();
                     textFields.get(i).setText(tempAnswer + ", " + point);
 
+                    Platform.runLater(()->{
+                        alphabetLabel.setText("Here Are Your Points :");
+                    });
                     showTime(10); //if time is changed, "sleep in server" before "sending roundScore" should be updated to (time + 1)
                 }
 
@@ -493,8 +496,8 @@ public class GameScreenController {
         reactionPane.setDisable(false);
 
         Platform.runLater(()->{
-            alphabetLabel.setText("Do You Consider These Answers To Be A \"" + category + "\"" + " ?(Must Starts With " + alphabet + " )" +
-                "\n(If None Is Chosen, \"Yes\" Will Be Automatically Ticked)");
+            alphabetLabel.setText("Are These Words \"" + category + "\"" + " ?(Must Start With " + alphabet + " )" +
+                "\n(If You Don't React , \"Yes\" Will Be Automatically Ticked)");
         });
 
 
@@ -522,10 +525,15 @@ public class GameScreenController {
             VBox vBox = new VBox();
 
             Label answer = new Label(othersAnswers.get(i));
+            answer.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
+
+
             ToggleGroup toggle = new ToggleGroup();
             MFXRadioButton radioButtonYes = new MFXRadioButton("Yes");
+            radioButtonYes.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
             radioButtonsYes.add(radioButtonYes);
             MFXRadioButton radioButtonNo = new MFXRadioButton("No");
+            radioButtonNo.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
             radioButtonsNo.add(radioButtonNo);
 
             radioButtonYes.setToggleGroup(toggle);

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import io.github.palexdev.materialfx.controls.legacy.MFXLegacyListView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" prefHeight="555.0" prefWidth="934.0" style="-fx-background-color: #D5F5E3;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.newesmfamil2.JoinGameController">
+   <children>
+      <MFXLegacyListView fx:id="serverListView" layoutX="67.0" layoutY="109.0" prefHeight="365.0" prefWidth="800.0" style="-fx-background-color: #D5F5E3;" />
+      <MFXTextField fx:id="clientNameField" floatingText="Your Name" layoutX="93.0" layoutY="34.0" prefHeight="50.0" prefWidth="293.0" style="-fx-background-color: #a1cdd1;">
+         <textFill>
+            <Color red="0.054901961237192154" green="0.2705882489681244" blue="0.29411765933036804" opacity="0.8700000047683716" />
+         </textFill>
+         <font>
+            <Font name="System Bold Italic" size="14.0" />
+         </font></MFXTextField>
+      <MFXButton fx:id="refreshButton" layoutX="585.0" layoutY="34.0" prefHeight="55.0" prefWidth="294.0" style="-fx-background-color: #1515;" text="Refresh" textFill="#0e454b">
+         <font>
+            <Font name="System Bold Italic" size="22.0" />
+         </font></MFXButton>
+      <Label fx:id="gameStateLabel" alignment="CENTER" layoutX="70.0" layoutY="477.0" prefHeight="78.0" prefWidth="800.0" text="Choose A Game" textAlignment="CENTER" textFill="#0e454b">
+         <font>
+            <Font name="System Bold Italic" size="17.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

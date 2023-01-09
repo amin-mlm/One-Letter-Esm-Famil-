@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXPasswordField?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" prefHeight="95.0" prefWidth="774.0" style="-fx-background-color: #99d1b1;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="41.0" layoutY="18.0" prefHeight="28.0" prefWidth="110.0" text="Game Name:" textFill="#0e454b">
+         <font>
+            <Font name="System Bold Italic" size="16.0" />
+         </font></Label>
+      <Label fx:id="gameNameLabel" layoutX="41.0" layoutY="52.0" prefHeight="28.0" prefWidth="110.0" text="Label" textFill="#0e454b">
+         <font>
+            <Font name="System Bold Italic" size="16.0" />
+         </font></Label>
+      <Label layoutX="198.0" layoutY="18.0" prefHeight="28.0" prefWidth="110.0" text="Host:" textFill="#0e454b">
+         <font>
+            <Font name="System Bold Italic" size="16.0" />
+         </font></Label>
+      <Label fx:id="hostLabel" layoutX="198.0" layoutY="52.0" prefHeight="28.0" prefWidth="110.0" text="Label" textFill="#0e454b">
+         <font>
+            <Font name="System Bold Italic" size="16.0" />
+         </font></Label>
+      <Label layoutX="319.0" layoutY="18.0" prefHeight="28.0" prefWidth="110.0" text="Rounds: " textFill="#0e454b">
+         <font>
+            <Font name="System Bold Italic" size="16.0" />
+         </font></Label>
+      <Label fx:id="roundsLabel" layoutX="319.0" layoutY="52.0" prefHeight="28.0" prefWidth="110.0" text="Label" textFill="#0e454b">
+         <font>
+            <Font name="System Bold Italic" size="16.0" />
+         </font></Label>
+      <MFXPasswordField fx:id="passField" floatingText="Password" layoutX="430.0" layoutY="24.0" prefHeight="50.0" prefWidth="231.0" style="-fx-background-color: #a1cdd1;">
+         <textFill>
+            <Color red="0.054901961237192154" green="0.2705882489681244" blue="0.29411765933036804" opacity="0.8700000047683716" />
+         </textFill>
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></MFXPasswordField>
+      <MFXButton fx:id="startButton" layoutX="684.0" layoutY="23.0" prefHeight="50.0" prefWidth="74.0" style="-fx-background-color: #0e454b;" text="Start" textFill="#24e0c4">
+         <font>
+            <Font name="System Bold Italic" size="16.0" />
+         </font></MFXButton>
+   </children>
+</AnchorPane>

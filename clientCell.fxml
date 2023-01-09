@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" prefHeight="95.0" prefWidth="376.0" style="-fx-background-color: #30dbd6;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="nameLabel" layoutX="54.0" layoutY="46.0" prefHeight="38.0" prefWidth="133.0">
+         <font>
+            <Font name="System Bold Italic" size="17.0" />
+         </font></Label>
+      <Label fx:id="scoreLabel" layoutX="197.0" layoutY="46.0" prefHeight="38.0" prefWidth="103.0">
+         <font>
+            <Font name="System Bold Italic" size="17.0" />
+         </font></Label>
+      <Label layoutX="54.0" layoutY="7.0" prefHeight="38.0" prefWidth="133.0" text="Name:">
+         <font>
+            <Font name="System Bold Italic" size="17.0" />
+         </font></Label>
+      <Label layoutX="200.0" layoutY="9.0" prefHeight="30.0" prefWidth="76.0" text="Score:">
+         <font>
+            <Font name="System Bold Italic" size="17.0" />
+         </font></Label>
+      <ImageView fx:id="userImage" fitHeight="24.0" fitWidth="24.0" layoutX="14.0" layoutY="51.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@assets/user.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="rank1Image" fitHeight="57.0" fitWidth="76.0" layoutX="300.0" layoutY="17.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@assets/gold_medal.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="rank2Image" fitHeight="57.0" fitWidth="76.0" layoutX="300.0" layoutY="17.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@assets/silver_medal.png" />
+         </image>
+      </ImageView>
+      <ImageView fx:id="rank3Image" fitHeight="57.0" fitWidth="76.0" layoutX="300.0" layoutY="17.0" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@assets/bronze_medal.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>

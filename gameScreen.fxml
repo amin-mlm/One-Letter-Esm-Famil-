@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import io.github.palexdev.materialfx.controls.legacy.MFXLegacyListView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" prefHeight="555.0" prefWidth="934.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <FlowPane fx:id="fieldPane" alignment="CENTER" disable="true" hgap="20.0" layoutX="70.0" layoutY="83.0" prefHeight="390.0" prefWidth="794.0" style="-fx-background-color: #D5F5E3;" vgap="20.0" visible="false" />
+      <FlowPane fx:id="reactionPane" alignment="CENTER" disable="true" hgap="50.0" layoutX="114.0" layoutY="83.0" prefHeight="378.0" prefWidth="704.0" style="-fx-background-color: #D5F5E3;" vgap="70.0" visible="false" />
+      <MFXButton fx:id="finishButton" disable="true" layoutX="252.0" layoutY="478.0" prefHeight="50.0" prefWidth="430.0" rippleColor="BLACK" style="-fx-background-color: #3232;" text="F I N I S H !" textAlignment="CENTER" visible="false">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font></MFXButton>
+      <Label fx:id="timeLabel" alignment="CENTER" disable="true" layoutX="403.0" layoutY="476.0" prefHeight="42.0" prefWidth="126.0" text="Label" textFill="#0e454b" visible="false">
+         <font>
+            <Font name="System Bold Italic" size="19.0" />
+         </font></Label>
+      <MFXTextField fx:id="alphabetField" disable="true" floatingText="alphabet" layoutX="370.0" layoutY="478.0" prefHeight="55.0" prefWidth="179.0" style="-fx-background-color: #89a7e7;" visible="false">
+         <textFill>
+            <Color red="0.054901961237192154" green="0.2705882489681244" blue="0.29411765933036804" opacity="0.8700000047683716" />
+         </textFill>
+         <font>
+            <Font name="System Bold Italic" size="14.0" />
+         </font></MFXTextField>
+      <MFXButton fx:id="alphabetButton" disable="true" layoutX="508.0" layoutY="478.0" prefHeight="55.0" prefWidth="42.0" rippleColor="BLACK" style="-fx-background-color: #6288E6;" text="send" textFill="#0e454b" visible="false">
+         <font>
+            <Font name="System Bold Italic" size="10.0" />
+         </font></MFXButton>
+      <Label fx:id="alphabetLabel" alignment="CENTER" layoutX="115.0" layoutY="53.0" prefHeight="92.0" prefWidth="704.0" textFill="#0e454b">
+         <font>
+            <Font name="System Bold Italic" size="21.0" />
+         </font></Label>
+      <Label fx:id="stateLabel" alignment="CENTER" disable="true" layoutX="178.0" layoutY="137.0" prefHeight="269.0" prefWidth="562.0" textFill="#0e454b" visible="false">
+         <font>
+            <Font name="System Bold Italic" size="24.0" />
+         </font>
+      </Label>
+      <MFXLegacyListView fx:id="scoreBoardListView" disable="true" layoutX="265.0" layoutY="25.0" prefHeight="506.0" prefWidth="400.0" visible="false" />
+      <MFXButton fx:id="newGameButton" disable="true" layoutX="725.0" layoutY="305.0" prefHeight="74.0" prefWidth="126.0" style="-fx-background-color: #6288E6;" text="New Game" textFill="#0e454b" visible="false">
+         <font>
+            <Font name="System Bold Italic" size="18.0" />
+         </font></MFXButton>
+      <MFXButton fx:id="exitButton" disable="true" layoutX="725.0" layoutY="421.0" prefHeight="74.0" prefWidth="126.0" style="-fx-background-color: #33A078;" text="Exit" textFill="#0e454b" visible="false">
+         <font>
+            <Font name="System Bold Italic" size="25.0" />
+         </font></MFXButton>
+      <Label fx:id="roundLabel" layoutX="14.0" layoutY="6.0" prefHeight="38.0" prefWidth="179.0" text="Round" textFill="#02a672">
+         <font>
+            <Font name="System Bold Italic" size="26.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
