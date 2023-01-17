@@ -47,6 +47,7 @@ public class JoinGameController {
 
     @FXML
     void initialize() {
+
         ArrayList<Server> servers = databaseHandler.showServers();
         System.out.println("in JoinGameController: " + servers.size());
         serversObservableList = FXCollections.observableArrayList();
@@ -68,7 +69,7 @@ public class JoinGameController {
     }
 
     public void joinToServer(int gamePort, String gameName, boolean isPasswordCorrect){
-        //fxmodify //fxmodify //fxmodify ...
+        //back to default state
         clientNameField.setStyle("-fx-border-color: ");
 
         if(this.gamePort!=-1){ //game is already chosen
@@ -84,7 +85,7 @@ public class JoinGameController {
                 gameStateLabel.setText("Enter A Valid Name(Shouldn't Start With Space)");
             new Fade(gameStateLabel).fadeIn();
 
-            clientNameField.setStyle("-fx-border-color: red");
+            clientNameField.setStyle("-fx-border-color: crimson");
             new Shaker(clientNameField).shake();
 
             return;
@@ -119,6 +120,7 @@ public class JoinGameController {
             client.joinToServer(gamePort);
             int result = client.waitForStart();
             if(result == -1){ //host left the game
+                this.gamePort = -1;
                 client.closeSocket();
 
                 Platform.runLater(()->{

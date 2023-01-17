@@ -9,6 +9,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.Blend?>
 <?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.Light.Distant?>
+<?import javafx.scene.effect.Lighting?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
@@ -158,9 +160,13 @@
          </font></MFXButton>
       <MFXLegacyTableView fx:id="playerNameTableView" disable="true" layoutX="33.0" layoutY="27.0" prefHeight="310.0" prefWidth="200.0" style="-fx-background-color: #1515;">
          <effect>
-            <DropShadow />
+            <Lighting bumpInput="$null">
+               <light>
+                  <Light.Distant />
+               </light>
+            </Lighting>
          </effect></MFXLegacyTableView>
-      <Label fx:id="errorLabel" alignment="BOTTOM_CENTER" layoutX="133.0" layoutY="487.0" prefHeight="68.0" prefWidth="678.0" textAlignment="CENTER" textFill="#dc6262">
+      <Label fx:id="errorLabel" alignment="BOTTOM_CENTER" layoutX="133.0" layoutY="487.0" prefHeight="68.0" prefWidth="678.0" textAlignment="CENTER" textFill="CRIMSON">
          <font>
             <Font name="System Bold Italic" size="20.0" />
          </font>

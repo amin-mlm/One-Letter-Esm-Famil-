@@ -131,7 +131,7 @@ public class CreateGameController {
 
             errorLabel.setText("");
 
-            //fxmodify
+            //back to default state
             hostNameField.setStyle("-fx-border-color: ");
             timey.setStyle("-fx-border-color: ");
             stopy.setStyle("-fx-border-color: ");
@@ -164,8 +164,9 @@ public class CreateGameController {
                 new Fade(errorLabel).fadeIn();
 
                 //fxmodify
-                timey.setStyle("-fx-border-color: red;");
-                stopy.setStyle("-fx-border-color: red;");
+                timey.setStyle("-fx-border-color: crimson;");
+                stopy.setStyle("-fx-border-color: crimson;");
+
                 new Shaker(timey).shake();
                 new Shaker(stopy).shake();
 
@@ -181,7 +182,7 @@ public class CreateGameController {
                     new Fade(errorLabel).fadeIn();
 
                     //fxmodify
-                    roundsField.setStyle("-fx-border-color: red;");
+                    roundsField.setStyle("-fx-border-color: crimson;");
                     new Shaker(roundsField).shake();
 
                     actionEvent.consume();
@@ -191,7 +192,7 @@ public class CreateGameController {
                 new Fade(errorLabel).fadeIn();
 
                 //fxmodify
-                roundsField.setStyle("-fx-border-color: red;");
+                roundsField.setStyle("-fx-border-color: crimson;");
                 new Shaker(roundsField).shake();
 
                 actionEvent.consume();
@@ -207,7 +208,7 @@ public class CreateGameController {
                 new Fade(errorLabel).fadeIn();
 
                 //fxmodify
-                gameNameField.setStyle("-fx-border-color: red;");
+                gameNameField.setStyle("-fx-border-color: crimson;");
                 new Shaker(gameNameField).shake();
 
                 actionEvent.consume();
@@ -221,7 +222,7 @@ public class CreateGameController {
                 new Fade(errorLabel).fadeIn();
 
                 //fxmodify
-                hostNameField.setStyle("-fx-border-color: red;");
+                hostNameField.setStyle("-fx-border-color: crimson;");
                 new Shaker(hostNameField).shake();
 
                 actionEvent.consume();

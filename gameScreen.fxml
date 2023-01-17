@@ -28,9 +28,9 @@
          <font>
             <Font name="System Bold Italic" size="14.0" />
          </font></MFXTextField>
-      <MFXButton fx:id="alphabetButton" disable="true" layoutX="508.0" layoutY="478.0" prefHeight="55.0" prefWidth="42.0" rippleColor="BLACK" style="-fx-background-color: #6288E6;" text="send" textFill="#0e454b" visible="false">
+      <MFXButton fx:id="alphabetButton" disable="true" layoutX="500.0" layoutY="478.0" prefHeight="55.0" prefWidth="50.0" rippleColor="BLACK" style="-fx-background-color: #6288E6;" text="send" textFill="#0e454b" visible="false">
          <font>
-            <Font name="System Bold Italic" size="10.0" />
+            <Font name="System Bold Italic" size="14.0" />
          </font></MFXButton>
       <Label fx:id="alphabetLabel" alignment="CENTER" layoutX="115.0" layoutY="53.0" prefHeight="92.0" prefWidth="704.0" textFill="#0e454b">
          <font>
@@ -42,7 +42,7 @@
          </font>
       </Label>
       <MFXLegacyListView fx:id="scoreBoardListView" disable="true" layoutX="265.0" layoutY="25.0" prefHeight="506.0" prefWidth="400.0" visible="false" />
-      <MFXButton fx:id="newGameButton" disable="true" layoutX="725.0" layoutY="305.0" prefHeight="74.0" prefWidth="126.0" style="-fx-background-color: #6288E6;" text="New Game" textFill="#0e454b" visible="false">
+      <MFXButton fx:id="newGameButton" disable="true" layoutX="725.0" layoutY="332.0" prefHeight="74.0" prefWidth="126.0" style="-fx-background-color: #6288E6;" text="New Game" textFill="#0e454b" visible="false">
          <font>
             <Font name="System Bold Italic" size="18.0" />
          </font></MFXButton>

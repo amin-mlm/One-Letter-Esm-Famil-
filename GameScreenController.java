@@ -198,14 +198,12 @@ public class GameScreenController {
 
 
     private int sendAlphabet() {
-        //fxmodify...
-//        alphabetField.setStyle("-fx-border-color: ");
-
         String alphabetString = alphabetField.getText();
         char alphabetChar;
 
         if (alphabetString.length() != 1) {
-            alphabetField.setStyle("-fx-border-color: red");
+            alphabetField.setStyle("-fx-border-color: crimson");
+
             Platform.runLater(()->{
                 alphabetField.setText("");
                 alphabetField.setPromptText("Only 1 letter");
@@ -219,12 +217,13 @@ public class GameScreenController {
             alphabetChar = alphabetString.charAt(0);
         }
         if (!((alphabetChar >= 65 && alphabetChar <= 90) || (alphabetChar >= 97 && alphabetChar <= 122))) {
-            alphabetField.setStyle("-fx-border-color: red");
+            alphabetField.setStyle("-fx-border-color: crimson");
             Platform.runLater(()->{
                 alphabetField.setText("");
                 alphabetField.setPromptText("Between A to Z");
             });
             new Shaker(alphabetField).shake();
+            new Shaker(alphabetButton).shake();
 
             return -1; //code for invalid alphabet error
         } else {
@@ -237,12 +236,13 @@ public class GameScreenController {
                 return 0; //code for everything is ok
             } else if (result == -1) {
                 System.out.println("gameScreen: repeated alpha try again");
-                alphabetField.setStyle("-fx-border-color: red");
+                alphabetField.setStyle("-fx-border-color: crimson");
                 Platform.runLater(()->{
                     alphabetField.setText("");
                     alphabetField.setPromptText("repeated alphabet");
                 });
                 new Shaker(alphabetField).shake();
+                new Shaker(alphabetButton).shake();
 
                 return -1; //code for invalid alphabet error
             }else if(result == -2){ //host left game
@@ -254,7 +254,9 @@ public class GameScreenController {
 
     private void startGame() {
         new Thread(() -> {
+
             String message = client.listenToSendAnswerMessage();
+
             if(message==null) //host left the game
                 return;
             if (message.equals("Send Your Answers")) {
@@ -268,21 +270,23 @@ public class GameScreenController {
 
                 //sleep here, instead of in server
                 //let server start to listen to all clients(222 server)
-                try {
-                    Thread.sleep(200); //fewer? how many? // can + 1000 for seeing disability of TextFs?
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
+                //was active
+//                try {
+//                    Thread.sleep(200); //fewer? how many? // can + 1000 for seeing disability of TextFs?
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
 
                 for (int i = 0; i < textFields.size(); i++) {
                     System.out.println("will sleep for 100 * " + (indexBetweenAllPlayers + 1));
 
                     //sleep to avoid sync data with other players
-                    try {
-                        Thread.sleep((long)100 * (indexBetweenAllPlayers + 1));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        Thread.sleep((long)100 * (indexBetweenAllPlayers + 1));
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
 
                     String answer = removeSpaceFromAnswer(textFields.get(i).getText());
                     ArrayList<String> othersAnswers = client.sendAnswerAndGetOthersAnswers(answer);
@@ -296,7 +300,7 @@ public class GameScreenController {
                     int point = sendReactionAndGetPoint(othersAnswers, fieldsString.get(i));
                     System.out.println("point for textField " + i + " = " + point);
 
-                    if(point==-1){
+                    if(point==-1){ //host left game
                         return;
                     }
 
@@ -308,7 +312,7 @@ public class GameScreenController {
                     Platform.runLater(()->{
                         alphabetLabel.setText("Here Are Your Points :");
                     });
-                    showTime(10); //if time is changed, "sleep in server" before "sending roundScore" should be updated to (time + 1)
+                    showTime(10); //seeing the points. if time is changed, "sleep in server" before "sending roundScore" should be updated to (time + 1)
                 }
 
                 if (++thisRound <= rounds) {
@@ -435,7 +439,6 @@ public class GameScreenController {
         stateLabel.setVisible(true);
         stateLabel.setDisable(false);
 
-
         Platform.runLater(()->{
             alphabetLabel.setText("");
             stateLabel.setText("You Got  " + thisRoundScore + "  In This Round !" +
@@ -453,19 +456,19 @@ public class GameScreenController {
         System.out.println("-----(before)reactionPane.size() when removing: " + reactionPane.getChildren().size());
 
         //remove previous round reaction radioButtons
-        while (reactionRadioButtons.size()!=0) {
-            Platform.runLater(()->{
-                reactionPane.getChildren().remove(0);
-            });
-            reactionRadioButtons.remove(0);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("-----(after)reactionRadioButtons.size() when removing: " + reactionRadioButtons.size());
-        System.out.println("-----(after)reactionPane.size() when removing: " + reactionPane.getChildren().size());
+//        while (reactionRadioButtons.size()!=0) {
+//            Platform.runLater(()->{
+//                reactionPane.getChildren().remove(0);
+//            });
+//            reactionRadioButtons.remove(0);
+//            try {
+//                Thread.sleep(100);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        System.out.println("-----(after)reactionRadioButtons.size() when removing: " + reactionRadioButtons.size());
+//        System.out.println("-----(after)reactionPane.size() when removing: " + reactionPane.getChildren().size());
 
 
         showTime(10);
@@ -476,11 +479,8 @@ public class GameScreenController {
         return 0;
     }
     private void nextRound() {
-
         initialize();
-
     }
-
 
     private void makeTextFieldsEnable() {
         for (int i = 0; i < textFields.size(); i++) {
@@ -496,8 +496,8 @@ public class GameScreenController {
         reactionPane.setDisable(false);
 
         Platform.runLater(()->{
-            alphabetLabel.setText("Are These Words \"" + category + "\"" + " ?(Must Start With " + alphabet + " )" +
-                "\n(If You Don't React , \"Yes\" Will Be Automatically Ticked)");
+            alphabetLabel.setText("Are These Words \"" + category + "\" ?" +
+                                  "\n(If You Don't React , \"Yes\" Will Be Automatically Ticked)");
         });
 
 
@@ -505,7 +505,7 @@ public class GameScreenController {
         ArrayList<RadioButton> radioButtonsYes = new ArrayList<>();
         ArrayList<RadioButton> radioButtonsNo = new ArrayList<>();
 
-        int[] similarAnswers = new int[othersAnswers.size()]; //e.g. index i in othersAnswers is similar to similarAnswers[i] so we won't create radioButton for othersAnswers.get(i)
+        int[] similarAnswers = new int[othersAnswers.size()]; //e.g. othersAnswer[i] is similar to similarAnswers[i] so we won't create radioButton for othersAnswers.get(i)
         Arrays.fill(similarAnswers, -1);
 
         for (int i = 0; i < othersAnswers.size(); i++) {
@@ -527,7 +527,6 @@ public class GameScreenController {
             Label answer = new Label(othersAnswers.get(i));
             answer.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
 
-
             ToggleGroup toggle = new ToggleGroup();
             MFXRadioButton radioButtonYes = new MFXRadioButton("Yes");
             radioButtonYes.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
@@ -548,11 +547,26 @@ public class GameScreenController {
             Platform.runLater(()->{
                 reactionPane.getChildren().add(vBox);
             });
+            System.out.println("--1----Reactionpane.size() " + reactionPane.getChildren().size());
+        }
+
+
+        if(reactionRadioButtons.size()==0){
+            System.out.println("--2----Reactionpane.size() " + reactionRadioButtons.size());
+            stateLabel.setVisible(true);
+            stateLabel.setDisable(false);
+
+            Platform.runLater(()->{
+                stateLabel.setText("No fields to check!");
+            });
         }
 
         showTime(5 * othersAnswers.size());
 
-//        if(client.getSocket().isInputShutdown()){ //is socket closed from server side? (or did host leave game)
+        stateLabel.setVisible(false);
+        stateLabel.setDisable(true);
+
+//        if(client.getSocket().isClosed()){ //is socket closed from clients? (or did client leave game)
 //            System.out.println("gameScreen returned");
 //            return -1;
 //        }
@@ -605,20 +619,32 @@ public class GameScreenController {
             e.printStackTrace();
         }
 
-        fieldPane.setVisible(true);
-        fieldPane.setDisable(false);
-
         reactionPane.setVisible(false);
         reactionPane.setDisable(true);
 
-        System.out.println("888 reactions.size() + " + reactions.size());
-        try {
-            Thread.sleep((long) 10 * indexBetweenAllPlayers);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return client.sendReactionsAndGetPoint(reactions);
+        fieldPane.setVisible(true);
+        fieldPane.setDisable(false);
 
+        //remove previous round reaction radioButtons
+        while (reactionRadioButtons.size()!=0) {
+            Platform.runLater(()->{
+                reactionPane.getChildren().remove(0);
+            });
+            reactionRadioButtons.remove(0);
+            try {
+                Thread.sleep(100); //can be ommited?
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("888 reactions.size() + " + reactions.size());
+//        try {
+//            Thread.sleep((long) 100 * (indexBetweenAllPlayers+1)); //was 10
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        return client.sendReactionsAndGetPoint(reactions);
     }
 
     private int isAnswerSimilarToOthers(String answer, int index, ArrayList<String> othersAnswers) {
@@ -697,7 +723,7 @@ public class GameScreenController {
         if(thisRound==1){
             for (String s : fieldsString) {
                 MFXTextField textField = new MFXTextField();
-                textField.setStyle("-fx-text-fill: #0e454b; -fx-font-size: 30xpx; -fx-font-style: Bold Italic;");
+//                textField.setStyle("-fx-text-fill: #0e454b; -fx-font-size: 30xpx; -fx-font-style: Bold Italic;");
                 textField.setBackground(new Background(new BackgroundFill(Paint.valueOf("#a1cdd1"), CornerRadii.EMPTY, Insets.EMPTY)));
                 textField.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 15));
                 textField.setDisable(true);

@@ -222,11 +222,12 @@ public class Server {
                         System.out.println("relatedIndex of finisher: " + relatedIndex);
                         scanners.get(relatedIndex).nextLine();
                     }).start();
-//                    try {
-//                        Thread.sleep(500); //was 20
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
+                    //sleep to start above thread
+                    try {
+                        Thread.sleep(100); //was 20, was 500, was nothing(newer)
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
                     //nothing
 
@@ -245,6 +246,9 @@ public class Server {
     }
 
     private synchronized void collectAndCheckAnswers(int finisherIndex) { //index in 3 arrayLists(sockets, scanners, printWriters)
+        for (int j = 0; j < printWriters.size(); j++) //was after thread
+            printWriters.get(j).println("Send Your Answers");
+
         new Thread(() -> {
             //get 1 field answer from all clients and
             // send back the points they are given for this
@@ -252,7 +256,8 @@ public class Server {
             for (int i = 0; i < numFields; i++) {
 
                 System.out.println("\nfield: " + (i + 1));
-                ArrayList<String> answers = new ArrayList<>();
+//                ArrayList<String> answers = new ArrayList<>();
+                String[] answers = new String[numPlayers];
                 ArrayList<String> points = new ArrayList<>();
 
                 for (index = 0; index < scanners.size(); index++) {
@@ -269,7 +274,8 @@ public class Server {
                             closeSockets();
                             return;
                         }
-                        answers.add(answer);
+//                        answers.add(answer);
+                        answers[relatedIndex] = answer;
                     }).start();
 
                     try {
@@ -278,18 +284,43 @@ public class Server {
                         e.printStackTrace();
                     }
                 }
-                while (answers.size() != scanners.size()) {
+//                while (answers.size() != scanners.size()) {
+//                    try {
+//                        Thread.sleep(200); //check the answers for amount every 200 millis
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    if (hostLeftGame){
+//                        return;
+//                    }
+//                }
+                //check if all reactions collected
+                while(true) {
+                    int j;
+                    for (j = 0; j < numPlayers; j++) {
+                        if(answers[j]==null) //is not the last reaction of this player collected?
+                            break;
+                    }
+                    if(j==numPlayers)
+                        break;
+
                     try {
-                        Thread.sleep(200); //check the answers for amount every 200 millis
+                        Thread.sleep(200); //check for reaction collection each 200 millis
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    
-                    if (hostLeftGame){
+
+                    if(hostLeftGame){
+                        System.out.println("--- server returned(collecting answers)");
                         return;
                     }
                 }
-                System.out.println("server, checking answers: " + answers);
+
+                System.out.println("server, checking answers: ");
+                for (int j = 0; j <answers.length; j++) {
+                    System.out.println(answers[j] + ", ");
+                }
 
                 points = getReactionsAndCalculatePoints(answers, fields.get(i));
 
@@ -345,17 +376,11 @@ public class Server {
                     }
                 }
 
-
                 sendScoreBoardToClients();
-
-
                 closeSockets();
             }
 
         }).start();
-
-        for (int j = 0; j < printWriters.size(); j++)
-            printWriters.get(j).println("Send Your Answers");
     }
 
 
@@ -398,18 +423,21 @@ public class Server {
     }
 
 
-    private ArrayList<String> getReactionsAndCalculatePoints(ArrayList<String> answers, String category) {
-        ArrayList<ArrayList<String>> allReactions = new ArrayList<>();
+    private ArrayList<String> getReactionsAndCalculatePoints(String[] answers, String category) {
+//        ArrayList<ArrayList<String>> allReactions = new ArrayList<>();
+        String[][] allReactions = new String[numPlayers][];
         for (index = 0; index < numPlayers; index++) {
-            ArrayList<String> reactionsOfOnePlayer = new ArrayList<>();
+//            ArrayList<String> reactionsOfOnePlayer = new ArrayList<>();
+            allReactions[index] = new String[numPlayers];
 
             //send "other answers" of players to them
             for (int i = 0; i < numPlayers; i++) {
                 if (index == i) //no need to send one's answer to oneself
                     continue;
-                System.out.println("send answer: " + answers.get(i) + " to client no." + index);
-                printWriters.get(index).println(answers.get(i));
+                System.out.println("send answer: " + answers[i] + " to client no." + index);
+                printWriters.get(index).println(answers[i]);
             }
+
             new Thread(() -> {
                 int relatedIndex = index;
                 System.out.println("server 260-307, relatedIndex : " + relatedIndex);
@@ -417,7 +445,8 @@ public class Server {
                 System.out.println("server, listening ... for reaction of player " + relatedIndex);
                 for (int i = 0; i < numPlayers; i++) {
                     if (i == relatedIndex) {
-                        reactionsOfOnePlayer.add("Positive");
+//                        reactionsOfOnePlayer.add("Positive");
+                        allReactions[relatedIndex][i] = "Positive"; //oneself reacts "Positive" to oneself answer
                     }
                     else{
                         String reaction;
@@ -430,25 +459,36 @@ public class Server {
                             return;
                         }
                         System.out.println("reaction of player " + relatedIndex + "to player " + i + " is: " + reaction);
-                        reactionsOfOnePlayer.add(reaction);
+//                        reactionsOfOnePlayer.add(reaction);
+                        allReactions[relatedIndex][i] = reaction;
                     }
                 }
                 System.out.println("---omran ino bbini");
-                allReactions.add(reactionsOfOnePlayer);
+//                allReactions.add(reactionsOfOnePlayer);
             }).start();
 
+
             try {
-                Thread.sleep(50); //important
+                Thread.sleep(100); //important was 50
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
         }
 
-        System.out.println("--- server while " + allReactions.size()  + "," +  numPlayers);
-        while (allReactions.size() != scanners.size()) {
+//        System.out.println("--- server while " + allReactions.size()  + "," +  numPlayers);
+        //check if all reactions collected
+        while(true) {
+            int i;
+            for (i = 0; i < numPlayers; i++) {
+                if(allReactions[i][numPlayers-1]==null) //is not the last reaction of this player collected?
+                     break;
+            }
+            if(i==numPlayers)
+                break;
+
             try {
-                Thread.sleep(200);
+                Thread.sleep(200); //check for reaction collection each 200 millis
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -459,19 +499,28 @@ public class Server {
             }
         }
 
-        System.out.println("all reactions: " + allReactions);
+//        System.out.println("all reactions: " + allReactions);
+        System.out.println("all reactions");
+        for (int i = 0; i < numPlayers; i++) {
+            System.out.print("[");
+            for (int j = 0; j <numPlayers; j++) {
+                System.out.print(allReactions[i][j]+",");
+            }
+            System.out.println("]");
+        }
+
         //count pos and neg reactions
         ArrayList<String> filteredAnswers = new ArrayList<>();
         for (int i = 0; i < numPlayers; i++) {
             int positiveReactions = 0;
             for (int j = 0; j < numPlayers; j++) {
-                if (i != j && allReactions.get(j).get(i).equals("Positive")) {
+                if (i != j && allReactions[j][i].equals("Positive")) {
                     positiveReactions++;
                 }
             }
             System.out.println("pos. reactions to i " + i + " is: " + positiveReactions);
             if (((double) positiveReactions / (numPlayers - 1)) >= ((double) rate / 100)) {
-                filteredAnswers.add(answers.get(i));
+                filteredAnswers.add(answers[i]);
             } else {
                 filteredAnswers.add("");
             }
@@ -501,7 +550,7 @@ public class Server {
 
 
     private void determineAlphabet() {
-        //index of player in scanners arraylist who has to determine the game alphabet
+        //index of player in "scanners" arraylist who has to determine the game alphabet
         int playerIndex = Integer.parseInt(serverPlan.charAt(thisRound - 1) + ""); //because thisRound start from 1
         String alphabetString;
         try {
@@ -516,15 +565,16 @@ public class Server {
             usedAlphabets.add(alphabetChar);
             printWriters.get(playerIndex).println(0 + ""); //code for no problem
 
-            try {
-                Thread.sleep(200); // can be omitted? yes 99% actually 200 is high
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            //sleep for player who wants to determine alphabet
+//            try {
+//                Thread.sleep(200); // can be omitted? yes 99% actually 200 is high
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
 
             sendAlphabetToClients(alphabetChar);
 
-        } else { //sent alphabet was repeated
+        } else { //received alphabet was repeated
             printWriters.get(playerIndex).println(-1 + ""); //code for problem
             determineAlphabet();
         }
