@@ -281,12 +281,12 @@ public class GameScreenController {
                 for (int i = 0; i < textFields.size(); i++) {
                     System.out.println("will sleep for 100 * " + (indexBetweenAllPlayers + 1));
 
-                    //sleep to avoid sync data with other players
-//                    try {
-//                        Thread.sleep((long)100 * (indexBetweenAllPlayers + 1));
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
+//                    sleep to avoid sync data with other players
+                    try {
+                        Thread.sleep((long)100 * (indexBetweenAllPlayers + 1));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
                     String answer = removeSpaceFromAnswer(textFields.get(i).getText());
                     ArrayList<String> othersAnswers = client.sendAnswerAndGetOthersAnswers(answer);
@@ -422,13 +422,28 @@ public class GameScreenController {
     private String removeSpaceFromAnswer(String primaryAnswer) {
         if(primaryAnswer.equals("")) return primaryAnswer;
 
-        var scanner = new Scanner(primaryAnswer);
+        Scanner scanner = new Scanner(primaryAnswer);
         String answer = "";
         while (scanner.hasNext()) {
             answer += scanner.next() + " ";
         }
         return answer.substring(0, answer.length()-1); //remove last space
     }
+//    private String removeSpaceFromAnswer(String primaryAnswer) {
+//        if(primaryAnswer.equals("")) return primaryAnswer;
+//
+//        Scanner scanner = new Scanner(primaryAnswer);
+//        String answer = "";
+//        while (scanner.hasNext()) {
+//            String temp = scanner.next();
+//            for (char character: temp.toCharArray()) {
+//                if()
+//            }
+//            answer += scanner.next() + " ";
+//        }
+//        return answer.substring(0, answer.length()-1); //remove last space
+//    }
+
 
     private int prepareNextRound() {
         int thisRoundScore = client.listenToRoundScore();
@@ -651,7 +666,7 @@ public class GameScreenController {
         for (int i = 0; i < othersAnswers.size(); i++) {
             if(i==index)
                 break;
-            if(othersAnswers.get(i).equals(answer))
+            if(othersAnswers.get(i).equalsIgnoreCase(answer))
                 return i;
         }
         return -1;

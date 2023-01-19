@@ -538,7 +538,7 @@ public class Server {
                 points.add(0 + "");
             else
                 for (int j = 0; j < numPlayers; j++) {
-                    if (i != j && answers.get(i).equals(answers.get(j))) {
+                    if (i != j && answers.get(i).equalsIgnoreCase(answers.get(j))) {
                         points.add(5 + "");
                         break;
                     } else if (j == numPlayers - 1)
@@ -561,8 +561,13 @@ public class Server {
             return;
         }
         char alphabetChar = alphabetString.charAt(0);
+        if(alphabetChar>=97 && alphabetChar<=122)
+            alphabetChar = (char)(alphabetChar - 32);
+
         if (!usedAlphabets.contains(alphabetChar)) {
+
             usedAlphabets.add(alphabetChar);
+
             printWriters.get(playerIndex).println(0 + ""); //code for no problem
 
             //sleep for player who wants to determine alphabet
