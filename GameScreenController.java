@@ -422,28 +422,13 @@ public class GameScreenController {
     private String removeSpaceFromAnswer(String primaryAnswer) {
         if(primaryAnswer.equals("")) return primaryAnswer;
 
-        Scanner scanner = new Scanner(primaryAnswer);
+        var scanner = new Scanner(primaryAnswer);
         String answer = "";
         while (scanner.hasNext()) {
             answer += scanner.next() + " ";
         }
         return answer.substring(0, answer.length()-1); //remove last space
     }
-//    private String removeSpaceFromAnswer(String primaryAnswer) {
-//        if(primaryAnswer.equals("")) return primaryAnswer;
-//
-//        Scanner scanner = new Scanner(primaryAnswer);
-//        String answer = "";
-//        while (scanner.hasNext()) {
-//            String temp = scanner.next();
-//            for (char character: temp.toCharArray()) {
-//                if()
-//            }
-//            answer += scanner.next() + " ";
-//        }
-//        return answer.substring(0, answer.length()-1); //remove last space
-//    }
-
 
     private int prepareNextRound() {
         int thisRoundScore = client.listenToRoundScore();
@@ -654,11 +639,11 @@ public class GameScreenController {
         }
 
         System.out.println("888 reactions.size() + " + reactions.size());
-//        try {
-//            Thread.sleep((long) 100 * (indexBetweenAllPlayers+1)); //was 10
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            Thread.sleep((long) 100 * (indexBetweenAllPlayers+1)); //was 10
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return client.sendReactionsAndGetPoint(reactions);
     }
 
@@ -666,7 +651,7 @@ public class GameScreenController {
         for (int i = 0; i < othersAnswers.size(); i++) {
             if(i==index)
                 break;
-            if(othersAnswers.get(i).equalsIgnoreCase(answer))
+            if(othersAnswers.get(i).equals(answer))
                 return i;
         }
         return -1;

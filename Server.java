@@ -538,7 +538,7 @@ public class Server {
                 points.add(0 + "");
             else
                 for (int j = 0; j < numPlayers; j++) {
-                    if (i != j && answers.get(i).equalsIgnoreCase(answers.get(j))) {
+                    if (i != j && answers.get(i).equals(answers.get(j))) {
                         points.add(5 + "");
                         break;
                     } else if (j == numPlayers - 1)
@@ -549,41 +549,71 @@ public class Server {
     }
 
 
+//    private void determineAlphabet() {
+//        //index of player in "scanners" arraylist who has to determine the game alphabet
+//        int playerIndex = Integer.parseInt(serverPlan.charAt(thisRound - 1) + ""); //because thisRound start from 1
+//        String alphabetString;
+//        try {
+//            alphabetString = scanners.get(playerIndex).nextLine();
+//        }catch (NoSuchElementException e){
+//            System.out.println("----noSuch SERVER 1(alphabet)");
+//            closeSockets();
+//            return;
+//        }
+//        char alphabetChar = alphabetString.charAt(0);
+//        if (!usedAlphabets.contains(alphabetChar)) {
+//            usedAlphabets.add(alphabetChar);
+//            printWriters.get(playerIndex).println(0 + ""); //code for no problem
+//
+//            //sleep for player who wants to determine alphabet
+////            try {
+////                Thread.sleep(200); // can be omitted? yes 99% actually 200 is high
+////            } catch (InterruptedException e) {
+////                e.printStackTrace();
+////            }
+//
+//            sendAlphabetToClients(alphabetChar);
+//
+//        } else { //received alphabet was repeated
+//            printWriters.get(playerIndex).println(-1 + ""); //code for issue
+//            determineAlphabet();
+//        }
+//    }
     private void determineAlphabet() {
-        //index of player in "scanners" arraylist who has to determine the game alphabet
-        int playerIndex = Integer.parseInt(serverPlan.charAt(thisRound - 1) + ""); //because thisRound start from 1
-        String alphabetString;
-        try {
-            alphabetString = scanners.get(playerIndex).nextLine();
-        }catch (NoSuchElementException e){
-            System.out.println("----noSuch SERVER 1(alphabet)");
-            closeSockets();
-            return;
-        }
-        char alphabetChar = alphabetString.charAt(0);
-        if(alphabetChar>=97 && alphabetChar<=122)
-            alphabetChar = (char)(alphabetChar - 32);
+    //index of player in "scanners" arraylist who has to determine the game alphabet
+    int playerIndex = Integer.parseInt(serverPlan.charAt(thisRound - 1) + ""); //because thisRound start from 1
+    String alphabetString;
+    try {
+        alphabetString = scanners.get(playerIndex).nextLine();
+    }catch (NoSuchElementException e){
+        System.out.println("----noSuch SERVER 1(alphabet)");
+        closeSockets();
+        return;
+    }
+    char alphabetChar = alphabetString.charAt(0);
+    if(alphabetChar>=97 && alphabetChar<=122)
+        alphabetChar = (char)(alphabetChar - 32);
 
-        if (!usedAlphabets.contains(alphabetChar)) {
+    if (!usedAlphabets.contains(alphabetChar)) {
 
-            usedAlphabets.add(alphabetChar);
+        usedAlphabets.add(alphabetChar);
 
-            printWriters.get(playerIndex).println(0 + ""); //code for no problem
+        printWriters.get(playerIndex).println(0 + ""); //code for no problem
 
-            //sleep for player who wants to determine alphabet
+        //sleep for player who wants to determine alphabet
 //            try {
 //                Thread.sleep(200); // can be omitted? yes 99% actually 200 is high
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
 //            }
 
-            sendAlphabetToClients(alphabetChar);
+        sendAlphabetToClients(alphabetChar);
 
-        } else { //received alphabet was repeated
-            printWriters.get(playerIndex).println(-1 + ""); //code for problem
-            determineAlphabet();
-        }
+    } else { //received alphabet was repeated
+        printWriters.get(playerIndex).println(-1 + ""); //code for problem
+        determineAlphabet();
     }
+}
 
     private void sendAlphabetToClients(char alphabetChar) {
         for (int i = 0; i < printWriters.size(); i++) {
