@@ -281,7 +281,7 @@ public class GameScreenController {
                 for (int i = 0; i < textFields.size(); i++) {
                     System.out.println("will sleep for 100 * " + (indexBetweenAllPlayers + 1));
 
-//                    sleep to avoid sync data with other players
+                    //sleep to avoid concurrent modification with other players
                     try {
                         Thread.sleep((long)100 * (indexBetweenAllPlayers + 1));
                     } catch (InterruptedException e) {
@@ -312,7 +312,7 @@ public class GameScreenController {
                     Platform.runLater(()->{
                         alphabetLabel.setText("Here Are Your Points :");
                     });
-                    showTime(10); //seeing the points. if time is changed, "sleep in server" before "sending roundScore" should be updated to (time + 1)
+                    showTime(10); //seeing the points. if time is changed, "sleep in server" before "sending roundScore" in collectAndCheckAnswers() should be updated to (time + 1)
                 }
 
                 if (++thisRound <= rounds) {
@@ -497,7 +497,7 @@ public class GameScreenController {
 
         Platform.runLater(()->{
             alphabetLabel.setText("Are These Words \"" + category + "\" ?" +
-                                  "\n(If You Don't React , \"Yes\" Will Be Automatically Ticked)");
+                                  "\nIf You Don't React , \"Yes\" Will Be Automatically Ticked");
         });
 
 

@@ -305,7 +305,7 @@ public class CreateGameController {
             }
         });
         startGameButton.setOnAction(actionEvent -> {
-            server.isAcceptingClientEnough = true;
+            server.setAcceptingClientEnoughTrue();
 
             //make a Client object for host to be considered a player
             Client client = new Client(hostNameField.getText());
@@ -319,11 +319,9 @@ public class CreateGameController {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-            new Thread( ()->{ //can be without thread? yes I think (no) I think
+            new Thread( ()->{
                 server.startGame();
             }).start();
-
         });
 
         //remove created game from database if the window is closed
